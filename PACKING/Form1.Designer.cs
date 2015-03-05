@@ -248,7 +248,7 @@
             this.Controls.Add(this.btnTodb);
             this.Controls.Add(this.lblVbeln);
             this.Name = "Form1";
-            this.Text = "PACKING 1.0";
+            this.Text = "PACKING 1.01";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvSelectOption)).EndInit();

@@ -16,6 +16,7 @@ namespace PACKINGLIST
     public partial class Form1 : Form
     {
         string D_connIP, D_connUser, D_connPwd, D_rptNm, D_status, D_connClient, D_connLanguage;
+        int itemCount = 0;
         public Form1()
         {
             sapReportPrms sapReportPrms = new sapReportPrms();
@@ -61,12 +62,12 @@ namespace PACKINGLIST
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
             RfcConfigParameters rfcPar = new RfcConfigParameters();
             rfcPar.Add(RfcConfigParameters.Name, "PRD");
-            rfcPar.Add(RfcConfigParameters.AppServerHost, D_connIP);
-            rfcPar.Add(RfcConfigParameters.Client, D_connClient);
-            rfcPar.Add(RfcConfigParameters.User, D_connUser);
-            rfcPar.Add(RfcConfigParameters.Password, D_connPwd);
+            rfcPar.Add(RfcConfigParameters.AppServerHost, D_connIP.ToString().Trim());
+            rfcPar.Add(RfcConfigParameters.Client, D_connClient.ToString().Trim());
+            rfcPar.Add(RfcConfigParameters.User, D_connUser.ToString().Trim());
+            rfcPar.Add(RfcConfigParameters.Password, D_connPwd.ToString().Trim());
             rfcPar.Add(RfcConfigParameters.SystemNumber, "00");
-            rfcPar.Add(RfcConfigParameters.Language, D_connLanguage);
+            rfcPar.Add(RfcConfigParameters.Language, D_connLanguage.ToString().Trim());
             RfcDestination dest = RfcDestinationManager.GetDestination(rfcPar);
             RfcRepository rfcrep = dest.Repository;
             IRfcFunction myfun = null;
@@ -184,7 +185,8 @@ namespace PACKINGLIST
                     }
 
                     //項目筆數
-                    int j = ITEM.RowCount;
+                    int j = ITEM.RowCount;                   
+
                     for (int i = 0; i <= ITEM.RowCount - 1; i++)
                     {
                         DataRow dr = dt.NewRow();
@@ -267,7 +269,7 @@ namespace PACKINGLIST
                         string matnr = ITEM.GetString("MATNR").ToString().TrimStart('0');
                         //品名
                         string arktx = ITEM.GetString("ARKTX").ToString();
-                        //牌參考號碼20140901移除
+                        //廠牌參考號碼20140901移除
                         //string bstkd_e = ITEM.GetString("BSTKD_E").ToString();
                         //單位
                         string vrkme = ITEM.GetString("VRKME").ToString();
@@ -282,17 +284,23 @@ namespace PACKINGLIST
                         //單箱數量
                         string boxqty = ITEM.GetString("BOXQTY").ToString().TrimEnd('0').TrimEnd('.');
                         //淨重
-                        string ntgew1 = ITEM.GetString("NTGEW1").ToString().TrimEnd('0').TrimEnd('.');
+                        //string ntgew1 = ITEM.GetString("NTGEW1").ToString().TrimEnd('0').TrimEnd('.');
+                        string ntgew1 = ITEM.GetString("NTGEW1").ToString();
                         //總淨重
-                        string ntgew2 = ITEM.GetString("NTGEW2").ToString().TrimEnd('0').TrimEnd('.');
+                        //string ntgew2 = ITEM.GetString("NTGEW2").ToString().TrimEnd('0').TrimEnd('.');
+                        string ntgew2 = ITEM.GetString("NTGEW2").ToString();
                         //毛重
-                        string ntgew3 = ITEM.GetString("NTGEW3").ToString().TrimEnd('0').TrimEnd('.');
+                        //string ntgew3 = ITEM.GetString("NTGEW3").ToString().TrimEnd('0').TrimEnd('.');
+                        string ntgew3 = ITEM.GetString("NTGEW3").ToString();
                         //總毛重
-                        string ntgew4 = ITEM.GetString("NTGEW4").ToString().TrimEnd('0').TrimEnd('.');
+                        //string ntgew4 = ITEM.GetString("NTGEW4").ToString().TrimEnd('0').TrimEnd('.');
+                        string ntgew4 = ITEM.GetString("NTGEW4").ToString();
                         //才數
-                        string volum1 = ITEM.GetString("VOLUM1").ToString().TrimEnd('0').TrimEnd('.');
+                        //string volum1 = ITEM.GetString("VOLUM1").ToString().TrimEnd('0').TrimEnd('.');
+                        string volum1 = ITEM.GetString("VOLUM1").ToString();
                         //總才數
-                        string volum2 = ITEM.GetString("VOLUM2").ToString().TrimEnd('0').TrimEnd('.');
+                        //string volum2 = ITEM.GetString("VOLUM2").ToString().TrimEnd('0').TrimEnd('.');
+                        string volum2 = ITEM.GetString("VOLUM2").ToString();
                         //項次
                         string posnr = ITEM.GetString("POSNR").ToString().TrimStart('0');
                         //舊料號
@@ -311,7 +319,7 @@ namespace PACKINGLIST
                         dr["客戶物料"] = kdmat;
                         dr["品號"] = matnr;
                         dr["品名"] = arktx;
-                        dr["單箱數量"] = boxqty;
+                        dr["單箱數量"] = boxqty.Trim();
                         dr["單位"] = vrkme;
                         dr["淨重"] = ntgew1;
                         dr["毛重"] = ntgew3;
@@ -363,23 +371,24 @@ namespace PACKINGLIST
             //datatable加總
             int totkwmeng = 0;
             int totctnqty = 0;
-            double totntgew1 = 0;
-            double totntgew2 = 0;
-            double totvolum1 = 0;
+            double totntgew1 = 0.000;
+            double totntgew2 = 0.000;
+            double totvolum1 = 0.000;
             foreach (DataRow dr in dt.Rows)
             {
                 if (dr.RowState != DataRowState.Deleted)
                     totkwmeng += Convert.ToInt32(dr["總數量"]);
-                totctnqty += Convert.ToInt32(dr["箱數"]);
-                totntgew1 += Convert.ToDouble(dr["總淨重"]);
-                totntgew2 += Convert.ToDouble(dr["總毛重"]);
-                totvolum1 += Convert.ToDouble(dr["總才數"]);
-            }
+                    totctnqty += Convert.ToInt32(dr["箱數"]);
+                    totntgew1 += Convert.ToDouble(dr["總淨重"]);
+                    totntgew2 += Convert.ToDouble(dr["總毛重"]);
+                    totvolum1 += Convert.ToDouble(dr["總才數"]);
+                }
+            
             listBox1.Items.Add("總數量：" + totkwmeng);
             listBox1.Items.Add("總箱數：" + totctnqty);
-            listBox1.Items.Add("總淨重：" + totntgew1);
-            listBox1.Items.Add("總毛重：" + totntgew2);
-            listBox1.Items.Add("總才數：" + totvolum1);
+            listBox1.Items.Add("總淨重：" + totntgew1.ToString("#.000"));
+            listBox1.Items.Add("總毛重：" + totntgew2.ToString("#.000"));
+            listBox1.Items.Add("總才數：" + totvolum1.ToString("#.000"));
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -401,11 +410,31 @@ namespace PACKINGLIST
             worksheet = workbook.Sheets["工作表1"];
             worksheet = workbook.ActiveSheet;
             worksheet.Name = "訂單包裝明細";
+            
+            // 將買方基本資料，放置於工作表左上角，[第一列，第一行]
             worksheet.Cells[1, 1] = lblVbeln.Text;
             worksheet.Cells[2, 1] = lblKunnr.Text;
             worksheet.Cells[3, 1] = lblName1.Text;
             worksheet.Cells[4, 1] = lblVdatu.Text;
             worksheet.Cells[5, 1] = "包裝單號：" + dataGridView1.Rows[0].Cells[38].Value.ToString();
+
+            // 計算項目資料筆數，26是最欄位數
+            itemCount = itemCount + 26 + dataGridView1.Rows.Count;
+
+            //設定 excel 資料格式為 文字
+            //客戶物料(3)	品號(4)	品名(5) 單位(7) 內盒(11)	外箱(12)	訂單號碼(13)
+            /*
+            worksheet.Range["C7", "C" + itemCount.ToString()].NumberFormat = "@";
+            worksheet.Range["D7", "D" + itemCount.ToString()].NumberFormat = "@";
+            worksheet.Range["E7", "E" + itemCount.ToString()].NumberFormat = "@";
+            worksheet.Range["G7", "G" + itemCount.ToString()].NumberFormat = "@";
+            worksheet.Range["K7", "K" + itemCount.ToString()].NumberFormat = "@";
+            worksheet.Range["L7", "L" + itemCount.ToString()].NumberFormat = "@";
+            worksheet.Range["M7", "M" + itemCount.ToString()].NumberFormat = "@";
+             */
+            //  excel 資料全部轉為文字 
+            worksheet.Columns.EntireColumn.NumberFormat = "@";
+            
             //表頭
             for (int i = 1; i < 26 + 1; i++) // dataGridView1.Columns.Count + 1
             {
@@ -416,13 +445,13 @@ namespace PACKINGLIST
             }
             //項目
             for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)  //DATAGRID行 
-            {
+            {                
                 for (int j = 0; j < 26; j++) //DATAGRID列 dataGridView1.Columns.Count
                 {
                     if (j <= 12)
                         worksheet.Cells[i * 2 + 9, j + 1] = dataGridView1.Rows[i].Cells[j].Value.ToString();
                     else if (j >= 13)
-                        worksheet.Cells[i * 2 + 10, j - 12] = dataGridView1.Rows[i].Cells[j].Value.ToString();
+                        worksheet.Cells[i * 2 + 10, j - 12] = dataGridView1.Rows[i].Cells[j].Value.ToString();                   
                 }
             }
             //內文
@@ -434,6 +463,7 @@ namespace PACKINGLIST
             {
                 File.Delete(path + "\\包裝明細清單.xlsx");
             }
+            
             worksheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬 
             workbook.SaveAs(path + "\\包裝明細清單.xlsx", Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
             app.Quit();
@@ -453,9 +483,9 @@ namespace PACKINGLIST
             else
             {
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-                //PACKING
+                //寫入 PACKING table
                 BluckPacking(dt);
-                //CUSTOMS
+                //寫入 CUSTOMS table
                 BluckCustoms(dt);
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
                 DialogResult dr = MessageBox.Show("資料已寫入資料庫" + Environment.NewLine + "鍵值為：" +dataGridView1.Rows[0].Cells[38].Value.ToString(), "資訊");
@@ -471,6 +501,7 @@ namespace PACKINGLIST
             SqlConnection Bulkcn = new SqlConnection(connectionString);
             SqlBulkCopy SBC = new SqlBulkCopy(Bulkcn);
             SBC.DestinationTableName = "dbo.PACKING";
+            
             //對應資料行
             SBC.ColumnMappings.Add("客戶物料", "CUS_ITEM");
             SBC.ColumnMappings.Add("訂單號碼", "NBR");
@@ -508,6 +539,8 @@ namespace PACKINGLIST
             SBC.ColumnMappings.Add("KEY", "KEY");
             SBC.ColumnMappings.Add("USERID", "USERID");
             Bulkcn.Open();
+
+            //寫入 PACKING table
             SBC.WriteToServer(dataTable);
             SBC.Close();
             Bulkcn.Close();
@@ -518,6 +551,8 @@ namespace PACKINGLIST
             SqlConnection Bulkcn = new SqlConnection(connectionString);
             SqlBulkCopy SBC = new SqlBulkCopy(Bulkcn);
             SBC.DestinationTableName = "dbo.CUSTOMS";
+
+            //對應資料行
             SBC.ColumnMappings.Add("KEY", "KEY");
             SBC.ColumnMappings.Add("訂單號碼", "NBR");
             SBC.ColumnMappings.Add("項次", "POSNR");
@@ -525,6 +560,8 @@ namespace PACKINGLIST
             SBC.ColumnMappings.Add("原始單價", "ORGNL");
             SBC.ColumnMappings.Add("客戶折價", "DSCNT");
             Bulkcn.Open();
+
+            //寫入 CUSTOMS table
             SBC.WriteToServer(dt);
             SBC.Close();
             Bulkcn.Close();
