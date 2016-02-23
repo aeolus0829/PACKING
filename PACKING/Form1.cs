@@ -19,20 +19,25 @@ namespace PACKINGLIST
         string pakTblNm = "dbo.PACKING";
         string cusTblNm = "dbo.CUSTOMS";
 
-        string D_connIP, D_connUser, D_connPwd, D_connClient, D_connLanguage, D_connSID, D_connRFC;
+        string D_connIP, D_connUser, D_connPwd, D_connClient, D_connLanguage, D_connSID, D_connRFC, D_status;
+        string userName, packingKey;
         int itemCount = 0;
-        bool D_status = true;
+        sapReportPrms sapReportPrms = new sapReportPrms();
+
         public Form1()
         {
-            D_connIP = "192.168.0.16";
-            D_connClient = "800";
-            D_connSID = "PRD";
+            string[] ALL = sapReportPrms.SQL();
+            D_status = ALL[4];
+
+            D_connIP = "192.168.0.15";
+            D_connClient = "300";
+            D_connSID = "DEV";
             D_connUser = "DDIC";
             D_connPwd = "Ubn3dx";
             D_connRFC = "ZSDRFC002";
             D_connLanguage = "ZF";
 
-            if (D_status == false)
+            if (D_status == "false")
             {
                 MessageBox.Show("目前程式停用中，請連絡資訊組");
             }
@@ -54,9 +59,9 @@ namespace PACKINGLIST
             dt.Clear();
             listBox1.Items.Clear();
             //使用者
-            string userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             //KEY
-            string packingKey = DateTime.Now.ToString("yyyyMMdd").Trim() + DateTime.Now.ToString("HHmmss").Trim();
+            packingKey = DateTime.Now.ToString("yyyyMMdd").Trim() + DateTime.Now.ToString("HHmmss").Trim();
 
             Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
             RfcConfigParameters rfcPara = new RfcConfigParameters();
@@ -74,9 +79,8 @@ namespace PACKINGLIST
 
             //結束箱號暫存
             int coNumEnd = 0;
-
-            //gvSelectOption筆數
             int orderNumberCount = gvOrderInput.RowCount - 1;
+
             if (orderNumberCount == 0)
             {
                 MessageBox.Show("請輸入訂單資料！", "錯誤");
@@ -183,9 +187,6 @@ namespace PACKINGLIST
 
                     }
 
-                    //項目筆數
-                    int j = ITEM.RowCount;                   
-
                     for (int i = 0; i <= ITEM.RowCount - 1; i++)
                     {
                         DataRow dr = dt.NewRow();
@@ -209,7 +210,7 @@ namespace PACKINGLIST
 
                             dt.Columns.Add("    ");
                             dt.Columns.Add(" ");
-                            dt.Columns.Add("  ");
+                            dt.Columns.Add("預計出貨日");
                             dt.Columns.Add("舊料號");
                             dt.Columns.Add("客戶訂單");
                             dt.Columns.Add("總數量");
@@ -221,6 +222,7 @@ namespace PACKINGLIST
                             dt.Columns.Add("外箱舊品號");
                             dt.Columns.Add("項次");
 
+                            // 以下資料不會轉出成 excel
                             dt.Columns.Add("箱號");
                             dt.Columns.Add("包裝指示碼");     
                             dt.Columns.Add("滿箱數");
@@ -228,7 +230,7 @@ namespace PACKINGLIST
                             dt.Columns.Add("買方名稱");
                             dt.Columns.Add("出貨人代號");
                             dt.Columns.Add("出貨人名稱");
-                            dt.Columns.Add("預計出貨日");
+                            // dt.Columns.Add("預計出貨日");
                             dt.Columns.Add("結帳月份");
                             dt.Columns.Add("起始箱號");
                             dt.Columns.Add("結束箱號");
@@ -245,20 +247,20 @@ namespace PACKINGLIST
                         //箱數
                         int ctnQty = Convert.ToInt32(ITEM.GetString("CTNQTY").ToString().TrimEnd('0').TrimEnd('.'));
                         //結束箱號，結束箱號
-                        int stabix = new int();
-                        int etabix = new int();
+                        int ctnNumStart, ctnNumEnd;
+
                         //箱數計算
                         if (i == 0 && k == 1)
                         {
-                            stabix = 1;
-                            etabix = ctnQty;
-                            coNumEnd = etabix;
+                            ctnNumStart = 1;
+                            ctnNumEnd = ctnQty;
+                            coNumEnd = ctnNumEnd;
                         }
                         else
                         {
-                            stabix = coNumEnd + 1;
-                            etabix = stabix + ctnQty - 1;
-                            coNumEnd = etabix;
+                            ctnNumStart = coNumEnd + 1;
+                            ctnNumEnd = ctnNumStart + ctnQty - 1;
+                            coNumEnd = ctnNumEnd;
                         }
                         //參考號碼(客戶物料)
                         string kdmat = ITEM.GetString("KDMAT").ToString();
@@ -313,7 +315,7 @@ namespace PACKINGLIST
                         //單價
                         string unitPrice = ITEM.GetString("U_PRICE").ToString();
 
-                        dr["起訖箱號"] = stabix + "~" + etabix;
+                        dr["起訖箱號"] = ctnNumStart + "~" + ctnNumEnd;
                         dr["箱數"] = ctnQty;
                         dr["客戶物料"] = kdmat;
                         dr["品號"] = matnr;
@@ -340,17 +342,18 @@ namespace PACKINGLIST
                         dr["外箱舊品號"] = ctn_o;
                         dr["項次"] = posnr;
 
-                        dr["箱號"] = etabix;
+                        dr["箱號"] = ctnNumEnd;
                         dr["包裝指示碼"] = pobjid;
                         dr["滿箱數"] = fullPackQty;
                         dr["買方代號"] = KUNNR_S;
                         dr["買方名稱"] = NAME1_S;
                         dr["出貨人代號"] = KUNNR_H;
                         dr["出貨人名稱"] = NAME1_H;
-                        dr["預計出貨日"] = Convert.ToDateTime(HEADER.GetString("VDATU")).ToString("yyyyMMdd");
+                        // dr["預計出貨日"] = Convert.ToDateTime(HEADER.GetString("VDATU")).ToString("yyyy/MM/dd");
+                        dr["預計出貨日"] = Convert.ToDateTime(ITEM.GetString("EDATU")).ToString("yyyy/MM/dd");
                         dr["結帳月份"] = Convert.ToDateTime(HEADER.GetString("VDATU")).ToString("yyyyMM");
-                        dr["起始箱號"] = stabix;
-                        dr["結束箱號"] = etabix;
+                        dr["起始箱號"] = ctnNumStart;
+                        dr["結束箱號"] = ctnNumEnd;
                         dr["單價"] = unitPrice;
                         dr["KEY"] = packingKey;
                         dr["USERID"] = userName;
@@ -359,7 +362,6 @@ namespace PACKINGLIST
 
                         dt.Rows.Add(dr);
                     }
-
                 }
 
                 dataGridView1.DataSource = dt.DefaultView;
@@ -399,7 +401,7 @@ namespace PACKINGLIST
         private void btnConvert_Click(object sender, EventArgs e)
         {
             //桌面路徑
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string desktopFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
             Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
@@ -414,7 +416,7 @@ namespace PACKINGLIST
             worksheet.Cells[2, 1] = lblKunnr.Text;
             worksheet.Cells[3, 1] = lblName1.Text;
             worksheet.Cells[4, 1] = lblVdatu.Text;
-            worksheet.Cells[5, 1] = "包裝單號：" + dataGridView1.Rows[0].Cells[38].Value.ToString();
+            worksheet.Cells[5, 1] = "包裝單號：" + packingKey;
 
             // 計算項目資料筆數，26是最大欄位數
             itemCount = itemCount + 26 + dataGridView1.Rows.Count;
@@ -458,13 +460,13 @@ namespace PACKINGLIST
             {
                 worksheet.Cells[s + 9 + dataGridView1.Rows.Count * 2, 1] = listBox1.Items[s].ToString();
             }
-            if (File.Exists(path + "\\包裝明細清單.xlsx"))
+            if (File.Exists(desktopFolderPath + "\\包裝明細清單.xlsx"))
             {
-                File.Delete(path + "\\包裝明細清單.xlsx");
+                File.Delete(desktopFolderPath + "\\包裝明細清單.xlsx");
             }
             
             worksheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬 
-            workbook.SaveAs(path + "\\包裝明細清單.xlsx", Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+            workbook.SaveAs(desktopFolderPath + "\\包裝明細清單.xlsx", Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
             app.Quit();
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
             MessageBox.Show("轉檔完畢!", "資訊");
