@@ -15,24 +15,26 @@ namespace PACKINGLIST
 {
     public partial class Form1 : Form
     {
-        string D_connIP, D_connUser, D_connPwd, D_rptNm, D_status, D_connClient, D_connLanguage;
+        string dbConnStr = "Data Source=SBSDB;Initial Catalog=PACKING_DEV;Uid=PACKING;Pwd=Admin12-1;";
+        string pakTblNm = "dbo.PACKING";
+        string cusTblNm = "dbo.CUSTOMS";
+
+        string D_connIP, D_connUser, D_connPwd, D_connClient, D_connLanguage, D_connSID, D_connRFC;
         int itemCount = 0;
+        bool D_status = true;
         public Form1()
         {
-            sapReportPrms sapReportPrms = new sapReportPrms();
-            string[] ALL = sapReportPrms.SQL();
+            D_connIP = "192.168.0.16";
+            D_connClient = "800";
+            D_connSID = "PRD";
+            D_connUser = "DDIC";
+            D_connPwd = "Ubn3dx";
+            D_connRFC = "ZSDRFC002";
+            D_connLanguage = "ZF";
 
-            D_connIP = ALL[0];
-            D_connUser = ALL[1];
-            D_connPwd = ALL[2];
-            D_rptNm = ALL[3];
-            D_status = ALL[4];
-            D_connClient = ALL[5];
-            D_connLanguage = ALL[6];
 
-            if (D_status == "False")
+            if (D_status == false)
             {
-                //目前程式停用中，請連絡資訊組
                 MessageBox.Show("目前程式停用中，請連絡資訊組");
             }
             else
@@ -42,7 +44,6 @@ namespace PACKINGLIST
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-            //清除資料
             dt.Clear();
             listBox1.Items.Clear();
         }
@@ -51,7 +52,6 @@ namespace PACKINGLIST
 
         private void BtnSubmit_Click(object sender, EventArgs e)
         {
-            //先清除資料
             dt.Clear();
             listBox1.Items.Clear();
             //使用者
@@ -61,7 +61,8 @@ namespace PACKINGLIST
      
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
             RfcConfigParameters rfcPar = new RfcConfigParameters();
-            rfcPar.Add(RfcConfigParameters.Name, "PRD");
+            
+            rfcPar.Add(RfcConfigParameters.Name, D_connSID );
             rfcPar.Add(RfcConfigParameters.AppServerHost, D_connIP.ToString().Trim());
             rfcPar.Add(RfcConfigParameters.Client, D_connClient.ToString().Trim());
             rfcPar.Add(RfcConfigParameters.User, D_connUser.ToString().Trim());
@@ -91,7 +92,7 @@ namespace PACKINGLIST
                     sEdatu = gvSelectOption.Rows[k - 1].Cells[1].Value.ToString().Trim();
                 }
                 //函數名稱
-                myfun = rfcrep.CreateFunction("ZSDRFC002");
+                myfun = rfcrep.CreateFunction(D_connRFC);
 
                 //設置輸入參數
                 myfun.SetValue("P_VBELN", sVbeln);
@@ -108,7 +109,6 @@ namespace PACKINGLIST
                 string title = "";
                 switch (type)
                 {
-                    //訊息類型︰S 成功，E 錯誤， W 警告﹐I 資訊﹐A 取消
                     case "S": title = "成功"; break;
                     case "E": title = "錯誤"; break;
                     case "W": title = "警告"; break;
@@ -363,7 +363,6 @@ namespace PACKINGLIST
 
                 }
 
-                //GridData資料來源
                 dataGridView1.DataSource = dt.DefaultView;
                 dataGridView1.ReadOnly = true;
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
@@ -386,9 +385,9 @@ namespace PACKINGLIST
             
             listBox1.Items.Add("總數量：" + totkwmeng);
             listBox1.Items.Add("總箱數：" + totctnqty);
-            listBox1.Items.Add("總淨重：" + totntgew1.ToString("#.000"));
-            listBox1.Items.Add("總毛重：" + totntgew2.ToString("#.000"));
-            listBox1.Items.Add("總才數：" + totvolum1.ToString("#.000"));
+            listBox1.Items.Add("總淨重：" + totntgew1.ToString("0.000")); // 小數會自動補0，格式為 1.000
+            listBox1.Items.Add("總毛重：" + totntgew2.ToString("0.000"));
+            listBox1.Items.Add("總才數：" + totvolum1.ToString("0.000"));
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -418,7 +417,7 @@ namespace PACKINGLIST
             worksheet.Cells[4, 1] = lblVdatu.Text;
             worksheet.Cells[5, 1] = "包裝單號：" + dataGridView1.Rows[0].Cells[38].Value.ToString();
 
-            // 計算項目資料筆數，26是最欄位數
+            // 計算項目資料筆數，26是最大欄位數
             itemCount = itemCount + 26 + dataGridView1.Rows.Count;
 
             //設定 excel 資料格式為 文字
@@ -432,6 +431,7 @@ namespace PACKINGLIST
             worksheet.Range["L7", "L" + itemCount.ToString()].NumberFormat = "@";
             worksheet.Range["M7", "M" + itemCount.ToString()].NumberFormat = "@";
              */
+
             //  excel 資料全部轉為文字 
             worksheet.Columns.EntireColumn.NumberFormat = "@";
             
@@ -484,9 +484,9 @@ namespace PACKINGLIST
             {
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
                 //寫入 PACKING table
-                BluckPacking(dt);
+                BluckWritToPacking(dt);
                 //寫入 CUSTOMS table
-                BluckCustoms(dt);
+                BulckWriteToCustoms(dt);
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
                 DialogResult dr = MessageBox.Show("資料已寫入資料庫" + Environment.NewLine + "鍵值為：" +dataGridView1.Rows[0].Cells[38].Value.ToString(), "資訊");
                 if (dr == DialogResult.OK)
@@ -495,12 +495,11 @@ namespace PACKINGLIST
                 }
             }
         }
-        private void BluckPacking(DataTable dataTable)
-        {
-            string connectionString = "Data Source=SBSDB;Initial Catalog=PACKING;Uid=PACKING;Pwd=Admin12-1;";
-            SqlConnection Bulkcn = new SqlConnection(connectionString);
+        private void BluckWritToPacking(DataTable dataTable)
+        {                                    
+            SqlConnection Bulkcn = new SqlConnection(dbConnStr);
             SqlBulkCopy SBC = new SqlBulkCopy(Bulkcn);
-            SBC.DestinationTableName = "dbo.PACKING";
+            SBC.DestinationTableName = pakTblNm;
             
             //對應資料行
             SBC.ColumnMappings.Add("客戶物料", "CUS_ITEM");
@@ -545,12 +544,12 @@ namespace PACKINGLIST
             SBC.Close();
             Bulkcn.Close();
         }
-        private void BluckCustoms(DataTable dataTable)
+        private void BulckWriteToCustoms(DataTable dataTable)
         {
-            string connectionString = "Data Source=SBSDB;Initial Catalog=PACKING;Uid=PACKING;Pwd=Admin12-1;";
-            SqlConnection Bulkcn = new SqlConnection(connectionString);
+
+            SqlConnection Bulkcn = new SqlConnection(dbConnStr);
             SqlBulkCopy SBC = new SqlBulkCopy(Bulkcn);
-            SBC.DestinationTableName = "dbo.CUSTOMS";
+            SBC.DestinationTableName = cusTblNm;
 
             //對應資料行
             SBC.ColumnMappings.Add("KEY", "KEY");
