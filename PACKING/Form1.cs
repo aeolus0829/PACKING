@@ -139,13 +139,13 @@ namespace PACKINGLIST
                     //訂單號碼
                     string VBELN = HEADER.GetString("VBELN").TrimStart('0');
                     //買方代號
-                    string KUNNR_S = HEADER.GetString("KUNNR_S");
+                    string buyerNum = HEADER.GetString("KUNNR_S");
                     //收貨方代號
-                    string KUNNR_H = HEADER.GetString("KUNNR_H");
+                    string shiperNum = HEADER.GetString("KUNNR_H");
                     //買方名稱
-                    string NAME1_S = HEADER.GetString("NAME1_S");
+                    string buyerName = HEADER.GetString("NAME1_S");
                     //收貨方名稱
-                    string NAME1_H = HEADER.GetString("NAME1_H");
+                    string shiperName = HEADER.GetString("NAME1_H");
                     //預計出貨日
                     string VDATU = Convert.ToDateTime(HEADER.GetString("VDATU")).ToString("yyyy/MM/dd");
 
@@ -162,9 +162,9 @@ namespace PACKINGLIST
                     if (k == orderNumberCount)
                     {
                         lblVbeln.Visible = true;
-                        lblKunnr.Text = "買方/出貨方 : " + KUNNR_S + " / " + KUNNR_H;
+                        lblKunnr.Text = "買方/出貨方 : " + buyerNum + " / " + shiperNum;
                         lblKunnr.Visible = true;
-                        lblName1.Text = "買方/出貨方 : " + NAME1_S + " / " + NAME1_H;
+                        lblName1.Text = "買方/出貨方 : " + buyerName + " / " + shiperName;
                         lblName1.Visible = true;
                         lblVdatu.Text = "預計出貨日 : " + VDATU;
                         lblVdatu.Visible = true;
@@ -262,92 +262,92 @@ namespace PACKINGLIST
                             coNumEnd = ctnNumEnd;
                         }
                         //參考號碼(客戶物料)
-                        string kdmat = ITEM.GetString("KDMAT").ToString();
+                        string cusMat = ITEM.GetString("KDMAT").ToString();
                         //客戶採購單
-                        string bstkd = ITEM.GetString("BSTKD").ToString();
+                        string cusPoNum = ITEM.GetString("BSTKD").ToString();
                         //品號
-                        string matnr = ITEM.GetString("MATNR").ToString().TrimStart('0');
+                        string matNum = ITEM.GetString("MATNR").ToString().TrimStart('0');
                         //品名
-                        string arktx = ITEM.GetString("ARKTX").ToString();
+                        string matName = ITEM.GetString("ARKTX").ToString();
                         //廠牌參考號碼20140901移除
                         //string bstkd_e = ITEM.GetString("BSTKD_E").ToString();
                         //單位
-                        string vrkme = ITEM.GetString("VRKME").ToString();
+                        string unitOfMeasure = ITEM.GetString("VRKME").ToString();
                         //數量
-                        string kwmeng = ITEM.GetString("KWMENG").ToString().TrimEnd('0').TrimEnd('.');
+                        string totQty = ITEM.GetString("KWMENG").ToString().TrimEnd('0').TrimEnd('.');
                         //內盒
-                        string box = ITEM.GetString("BOX").ToString().TrimStart('0');
+                        string boxMatNum = ITEM.GetString("BOX").ToString().TrimStart('0');
                         //外箱
-                        string ctn = ITEM.GetString("CTN").ToString().TrimStart('0');
+                        string ctnMatNum = ITEM.GetString("CTN").ToString().TrimStart('0');
                         //滿箱數
                         string fullPackQty = ITEM.GetString("PACKQTY").ToString().TrimEnd('0').TrimEnd('.');
                         //單箱數量
                         string boxQty = ITEM.GetString("BOXQTY").ToString().TrimEnd('0').TrimEnd('.');
                         //淨重
                         //string ntgew1 = ITEM.GetString("NTGEW1").ToString().TrimEnd('0').TrimEnd('.');
-                        string ntgew1 = ITEM.GetString("NTGEW1").ToString();
+                        string netWeight = ITEM.GetString("NTGEW1").ToString();
                         //總淨重
                         //string ntgew2 = ITEM.GetString("NTGEW2").ToString().TrimEnd('0').TrimEnd('.');
-                        string ntgew2 = ITEM.GetString("NTGEW2").ToString();
+                        string totNetWeight = ITEM.GetString("NTGEW2").ToString();
                         //毛重
                         //string ntgew3 = ITEM.GetString("NTGEW3").ToString().TrimEnd('0').TrimEnd('.');
-                        string ntgew3 = ITEM.GetString("NTGEW3").ToString();
+                        string grossWeight = ITEM.GetString("NTGEW3").ToString();
                         //總毛重
                         //string ntgew4 = ITEM.GetString("NTGEW4").ToString().TrimEnd('0').TrimEnd('.');
-                        string ntgew4 = ITEM.GetString("NTGEW4").ToString();
+                        string totGrossWeight = ITEM.GetString("NTGEW4").ToString();
                         //才數
                         //string volum1 = ITEM.GetString("VOLUM1").ToString().TrimEnd('0').TrimEnd('.');
-                        string volum1 = ITEM.GetString("VOLUM1").ToString();
+                        string volume = ITEM.GetString("VOLUM1").ToString();
                         //總才數
                         //string volum2 = ITEM.GetString("VOLUM2").ToString().TrimEnd('0').TrimEnd('.');
-                        string volum2 = ITEM.GetString("VOLUM2").ToString();
+                        string totVolume = ITEM.GetString("VOLUM2").ToString();
                         //項次
-                        string posnr = ITEM.GetString("POSNR").ToString().TrimStart('0');
+                        string itemNum = ITEM.GetString("POSNR").ToString().TrimStart('0');
                         //舊料號
-                        string ihrez_e = ITEM.GetString("IHREZ_E").ToString();
+                        string oldMatNum = ITEM.GetString("IHREZ_E").ToString();
                         //舊外箱
-                        string ctn_o = ITEM.GetString("CTN_O").ToString();
+                        string ctnOldMatNum = ITEM.GetString("CTN_O").ToString();
                         //舊內盒
-                        string box_o = ITEM.GetString("BOX_O").ToString();
+                        string boxOldMatNum = ITEM.GetString("BOX_O").ToString();
                         //包裝指示碼
-                        string pobjid = ITEM.GetString("POBJID").ToString();
+                        string packingInstruc = ITEM.GetString("POBJID").ToString();
                         //單價
                         string unitPrice = ITEM.GetString("U_PRICE").ToString();
 
                         dr["起訖箱號"] = ctnNumStart + "~" + ctnNumEnd;
                         dr["箱數"] = ctnQty;
-                        dr["客戶物料"] = kdmat;
-                        dr["品號"] = matnr;
-                        dr["品名"] = arktx;
+                        dr["客戶物料"] = cusMat;
+                        dr["品號"] = matNum;
+                        dr["品名"] = matName;
                         dr["單箱數量"] = boxQty.Trim();
-                        dr["單位"] = vrkme;
-                        dr["淨重"] = ntgew1;
-                        dr["毛重"] = ntgew3;
-                        dr["才數"] = volum1;
-                        dr["內盒"] = box;
-                        dr["外箱"] = ctn;
+                        dr["單位"] = unitOfMeasure;
+                        dr["淨重"] = netWeight;
+                        dr["毛重"] = grossWeight;
+                        dr["才數"] = volume;
+                        dr["內盒"] = boxMatNum;
+                        dr["外箱"] = ctnMatNum;
                         dr["訂單號碼"] = VBELN;
                         //2014/09/01移除廠牌參考號碼
                         //dr["廠牌參考號碼"] = bstkd_e;
                         //2014/07/28 add REF
                         //dr["REF"] = ITEM.GetString("REF").ToString();
-                        dr["舊料號"] = ihrez_e;
-                        dr["客戶訂單"] = bstkd;
-                        dr["總數量"] = kwmeng;
-                        dr["總淨重"] = ntgew2;
-                        dr["總毛重"] = ntgew4;
-                        dr["總才數"] = volum2;
-                        dr["內盒舊品號"] = box_o;
-                        dr["外箱舊品號"] = ctn_o;
-                        dr["項次"] = posnr;
+                        dr["舊料號"] = oldMatNum;
+                        dr["客戶訂單"] = cusPoNum;
+                        dr["總數量"] = totQty;
+                        dr["總淨重"] = totNetWeight;
+                        dr["總毛重"] = totGrossWeight;
+                        dr["總才數"] = totVolume;
+                        dr["內盒舊品號"] = boxOldMatNum;
+                        dr["外箱舊品號"] = ctnOldMatNum;
+                        dr["項次"] = itemNum;
 
                         dr["箱號"] = ctnNumEnd;
-                        dr["包裝指示碼"] = pobjid;
+                        dr["包裝指示碼"] = packingInstruc;
                         dr["滿箱數"] = fullPackQty;
-                        dr["買方代號"] = KUNNR_S;
-                        dr["買方名稱"] = NAME1_S;
-                        dr["出貨人代號"] = KUNNR_H;
-                        dr["出貨人名稱"] = NAME1_H;
+                        dr["買方代號"] = buyerNum;
+                        dr["買方名稱"] = buyerName;
+                        dr["出貨人代號"] = shiperNum;
+                        dr["出貨人名稱"] = shiperName;
                         // dr["預計出貨日"] = Convert.ToDateTime(HEADER.GetString("VDATU")).ToString("yyyy/MM/dd");
                         dr["預計出貨日"] = Convert.ToDateTime(ITEM.GetString("EDATU")).ToString("yyyy/MM/dd");
                         dr["結帳月份"] = Convert.ToDateTime(HEADER.GetString("VDATU")).ToString("yyyyMM");
@@ -358,7 +358,6 @@ namespace PACKINGLIST
                         dr["USERID"] = userName;
                         dr["原始單價"] = ITEM.GetString("KBTER1").ToString();
                         dr["客戶折價"] = ITEM.GetString("KBTER2").ToString();
-
                         dt.Rows.Add(dr);
                     }
                 }
@@ -488,7 +487,7 @@ namespace PACKINGLIST
                 //寫入 CUSTOMS table
                 bulkWriteToCustoms(dt);
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
-                DialogResult dr = MessageBox.Show("資料已寫入資料庫" + Environment.NewLine + "鍵值為：" +dataGridView1.Rows[0].Cells[38].Value.ToString(), "資訊");
+                DialogResult dr = MessageBox.Show("資料已寫入資料庫" + Environment.NewLine + "鍵值為：" + packingKey, "資訊");
                 if (dr == DialogResult.OK)
                 {
                     btnClear.PerformClick();
@@ -537,9 +536,8 @@ namespace PACKINGLIST
             SBC.ColumnMappings.Add("買方名稱", "NAME1_S");
             SBC.ColumnMappings.Add("KEY", "KEY");
             SBC.ColumnMappings.Add("USERID", "USERID");
-            bulkConn.Open();
 
-            //寫入 PACKING table
+            bulkConn.Open();
             SBC.WriteToServer(dataTable);
             SBC.Close();
             bulkConn.Close();
@@ -558,9 +556,8 @@ namespace PACKINGLIST
             SBC.ColumnMappings.Add("單價", "PRICE");
             SBC.ColumnMappings.Add("原始單價", "ORGNL");
             SBC.ColumnMappings.Add("客戶折價", "DSCNT");
-            bulkConn.Open();
 
-            //寫入 CUSTOMS table
+            bulkConn.Open();
             SBC.WriteToServer(dt);
             SBC.Close();
             bulkConn.Close();
