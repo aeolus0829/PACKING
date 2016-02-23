@@ -191,8 +191,7 @@ namespace PACKINGLIST
                     {
                         DataRow dr = dt.NewRow();
 
-                        bool yesOrNo = dt.Columns.Contains("起訖箱號");
-                        if (i == 0 && yesOrNo == false)
+                        if (i == 0 && ! dt.Columns.Contains("起訖箱號"))
                         {
                             dt.Columns.Add("起訖箱號");
                             dt.Columns.Add("箱數");
