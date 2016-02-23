@@ -229,7 +229,6 @@ namespace PACKINGLIST
                             dt.Columns.Add("買方名稱");
                             dt.Columns.Add("出貨人代號");
                             dt.Columns.Add("出貨人名稱");
-                            // dt.Columns.Add("預計出貨日");
                             dt.Columns.Add("結帳月份");
                             dt.Columns.Add("起始箱號");
                             dt.Columns.Add("結束箱號");
@@ -269,8 +268,6 @@ namespace PACKINGLIST
                         string matNum = ITEM.GetString("MATNR").ToString().TrimStart('0');
                         //品名
                         string matName = ITEM.GetString("ARKTX").ToString();
-                        //廠牌參考號碼20140901移除
-                        //string bstkd_e = ITEM.GetString("BSTKD_E").ToString();
                         //單位
                         string unitOfMeasure = ITEM.GetString("VRKME").ToString();
                         //數量
@@ -284,22 +281,16 @@ namespace PACKINGLIST
                         //單箱數量
                         string boxQty = ITEM.GetString("BOXQTY").ToString().TrimEnd('0').TrimEnd('.');
                         //淨重
-                        //string ntgew1 = ITEM.GetString("NTGEW1").ToString().TrimEnd('0').TrimEnd('.');
                         string netWeight = ITEM.GetString("NTGEW1").ToString();
                         //總淨重
-                        //string ntgew2 = ITEM.GetString("NTGEW2").ToString().TrimEnd('0').TrimEnd('.');
                         string totNetWeight = ITEM.GetString("NTGEW2").ToString();
                         //毛重
-                        //string ntgew3 = ITEM.GetString("NTGEW3").ToString().TrimEnd('0').TrimEnd('.');
                         string grossWeight = ITEM.GetString("NTGEW3").ToString();
                         //總毛重
-                        //string ntgew4 = ITEM.GetString("NTGEW4").ToString().TrimEnd('0').TrimEnd('.');
                         string totGrossWeight = ITEM.GetString("NTGEW4").ToString();
                         //才數
-                        //string volum1 = ITEM.GetString("VOLUM1").ToString().TrimEnd('0').TrimEnd('.');
                         string volume = ITEM.GetString("VOLUM1").ToString();
                         //總才數
-                        //string volum2 = ITEM.GetString("VOLUM2").ToString().TrimEnd('0').TrimEnd('.');
                         string totVolume = ITEM.GetString("VOLUM2").ToString();
                         //項次
                         string itemNum = ITEM.GetString("POSNR").ToString().TrimStart('0');
@@ -327,10 +318,6 @@ namespace PACKINGLIST
                         dr["內盒"] = boxMatNum;
                         dr["外箱"] = ctnMatNum;
                         dr["訂單號碼"] = VBELN;
-                        //2014/09/01移除廠牌參考號碼
-                        //dr["廠牌參考號碼"] = bstkd_e;
-                        //2014/07/28 add REF
-                        //dr["REF"] = ITEM.GetString("REF").ToString();
                         dr["舊料號"] = oldMatNum;
                         dr["客戶訂單"] = cusPoNum;
                         dr["總數量"] = totQty;
@@ -348,7 +335,6 @@ namespace PACKINGLIST
                         dr["買方名稱"] = buyerName;
                         dr["出貨人代號"] = shiperNum;
                         dr["出貨人名稱"] = shiperName;
-                        // dr["預計出貨日"] = Convert.ToDateTime(HEADER.GetString("VDATU")).ToString("yyyy/MM/dd");
                         dr["預計出貨日"] = Convert.ToDateTime(ITEM.GetString("EDATU")).ToString("yyyy/MM/dd");
                         dr["結帳月份"] = Convert.ToDateTime(HEADER.GetString("VDATU")).ToString("yyyyMM");
                         dr["起始箱號"] = ctnNumStart;
