@@ -24,14 +24,13 @@ namespace PACKINGLIST
         bool D_status = true;
         public Form1()
         {
-            D_connIP = "192.168.0.16";
-            D_connClient = "800";
-            D_connSID = "PRD";
+            D_connIP = "192.168.0.15";
+            D_connClient = "300";
+            D_connSID = "DEV";
             D_connUser = "DDIC";
             D_connPwd = "Ubn3dx";
             D_connRFC = "ZSDRFC002";
             D_connLanguage = "ZF";
-
 
             if (D_status == false)
             {
@@ -58,77 +57,77 @@ namespace PACKINGLIST
             string username = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             //KEY
             string key = DateTime.Now.ToString("yyyyMMdd").Trim() + DateTime.Now.ToString("HHmmss").Trim();
-     
-            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-            RfcConfigParameters rfcPar = new RfcConfigParameters();
+
+            Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+            RfcConfigParameters rfcPara = new RfcConfigParameters();
             
-            rfcPar.Add(RfcConfigParameters.Name, D_connSID );
-            rfcPar.Add(RfcConfigParameters.AppServerHost, D_connIP.ToString().Trim());
-            rfcPar.Add(RfcConfigParameters.Client, D_connClient.ToString().Trim());
-            rfcPar.Add(RfcConfigParameters.User, D_connUser.ToString().Trim());
-            rfcPar.Add(RfcConfigParameters.Password, D_connPwd.ToString().Trim());
-            rfcPar.Add(RfcConfigParameters.SystemNumber, "00");
-            rfcPar.Add(RfcConfigParameters.Language, D_connLanguage.ToString().Trim());
-            RfcDestination dest = RfcDestinationManager.GetDestination(rfcPar);
-            RfcRepository rfcrep = dest.Repository;
-            IRfcFunction myfun = null;
+            rfcPara.Add(RfcConfigParameters.Name, D_connSID );
+            rfcPara.Add(RfcConfigParameters.AppServerHost, D_connIP.ToString().Trim());
+            rfcPara.Add(RfcConfigParameters.Client, D_connClient.ToString().Trim());
+            rfcPara.Add(RfcConfigParameters.User, D_connUser.ToString().Trim());
+            rfcPara.Add(RfcConfigParameters.Password, D_connPwd.ToString().Trim());
+            rfcPara.Add(RfcConfigParameters.SystemNumber, "00");
+            rfcPara.Add(RfcConfigParameters.Language, D_connLanguage.ToString().Trim());
+            RfcDestination rfcDest = RfcDestinationManager.GetDestination(rfcPara);
+            RfcRepository rfcRepo = rfcDest.Repository;
+            IRfcFunction rfcFMname = null;
 
             //結束箱號暫存
-            int count = 0;
+            int coNumEnd = 0;
 
             //gvSelectOption筆數
-            int n = gvSelectOption.RowCount - 1;
-            if (n == 0)
+            int orderNumberCount = gvOrderInput.RowCount - 1;
+            if (orderNumberCount == 0)
             {
-                MessageBox.Show("請輸入查詢資料！", "錯誤");
+                MessageBox.Show("請輸入訂單資料！", "錯誤");
             }
-            for (int k = 1; k <= n; k++)
+            for (int k = 1; k <= orderNumberCount; k++)
             {
                 //輸入參數
-                String sVbeln = gvSelectOption.Rows[k - 1].Cells[0].Value.ToString().Trim();
-                String sEdatu = null;
-                if (gvSelectOption.Rows[k - 1].Cells[1].Value != null)
+                String orderNumber = gvOrderInput.Rows[k - 1].Cells[0].Value.ToString().Trim();
+                String deliveryDate = null;
+                if (gvOrderInput.Rows[k - 1].Cells[1].Value != null)
                 {
-                    sEdatu = gvSelectOption.Rows[k - 1].Cells[1].Value.ToString().Trim();
+                    deliveryDate = gvOrderInput.Rows[k - 1].Cells[1].Value.ToString().Trim();
                 }
                 //函數名稱
-                myfun = rfcrep.CreateFunction(D_connRFC);
+                rfcFMname = rfcRepo.CreateFunction(D_connRFC);
 
                 //設置輸入參數
-                myfun.SetValue("P_VBELN", sVbeln);
-                if (sEdatu != null) myfun.SetValue("P_EDATU", sEdatu);
+                rfcFMname.SetValue("P_VBELN", orderNumber);
+                if (deliveryDate != null) rfcFMname.SetValue("P_EDATU", deliveryDate);
 
                 //調用RFC方法
-                myfun.Invoke(dest);
+                rfcFMname.Invoke(rfcDest);
 
                 //輸出參數
-                string type = myfun.GetValue("STYPE").ToString();
-                string status = myfun.GetValue("STATUS").ToString();
+                string messageType = rfcFMname.GetValue("STYPE").ToString();
+                string messageStatus = rfcFMname.GetValue("STATUS").ToString();
 
                 // Declare message title. 
-                string title = "";
-                switch (type)
+                string dialogTitle = "";
+                switch (messageType)
                 {
-                    case "S": title = "成功"; break;
-                    case "E": title = "錯誤"; break;
-                    case "W": title = "警告"; break;
-                    case "I": title = "資訊"; break;
-                    case "A": title = "取消"; break;
+                    case "S": dialogTitle = "成功"; break;
+                    case "E": dialogTitle = "錯誤"; break;
+                    case "W": dialogTitle = "警告"; break;
+                    case "I": dialogTitle = "資訊"; break;
+                    case "A": dialogTitle = "取消"; break;
                 }
 
                 //MessageBox.Show(status, title);
-                if (status != "")
+                if (messageStatus != "")
                 {
-                    MessageBox.Show(status, title);
+                    MessageBox.Show(messageStatus, dialogTitle);
                     //btnClear.PerformClick();
                 }
                 else
                 {
-                    IRfcTable HEADER = myfun.GetTable("HEADER");
-                    IRfcTable ITEM = myfun.GetTable("ITEM");
-                    IRfcTable TLINE1 = myfun.GetTable("TLINE1");
-                    IRfcTable TLINE2 = myfun.GetTable("TLINE2");
-                    IRfcTable TLINE3 = myfun.GetTable("TLINE3");
+                    IRfcTable HEADER = rfcFMname.GetTable("HEADER");
+                    IRfcTable ITEM = rfcFMname.GetTable("ITEM");
+                    IRfcTable TLINE1 = rfcFMname.GetTable("TLINE1");
+                    IRfcTable TLINE2 = rfcFMname.GetTable("TLINE2");
+                    IRfcTable TLINE3 = rfcFMname.GetTable("TLINE3");
 
 
                     //当前内表的索引行
@@ -156,7 +155,7 @@ namespace PACKINGLIST
                         lblVbeln.Text = lblVbeln.Text + " ; " + VBELN;
                     }
                     //顯示最後一筆的資料
-                    if (k == n)
+                    if (k == orderNumberCount)
                     {
                         lblVbeln.Visible = true;
                         lblKunnr.Text = "買方/出貨方 : " + KUNNR_S + " / " + KUNNR_H;
@@ -253,13 +252,13 @@ namespace PACKINGLIST
                         {
                             stabix = 1;
                             etabix = ctnqty;
-                            count = etabix;
+                            coNumEnd = etabix;
                         }
                         else
                         {
-                            stabix = count + 1;
+                            stabix = coNumEnd + 1;
                             etabix = stabix + ctnqty - 1;
-                            count = etabix;
+                            coNumEnd = etabix;
                         }
                         //參考號碼(客戶物料)
                         string kdmat = ITEM.GetString("KDMAT").ToString();
