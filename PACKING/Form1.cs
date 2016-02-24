@@ -209,7 +209,7 @@ namespace PACKINGLIST
 
                             dt.Columns.Add("    ");
                             dt.Columns.Add(" ");
-                            dt.Columns.Add("預計出貨日");
+                            dt.Columns.Add(" ");
                             dt.Columns.Add("舊料號");
                             dt.Columns.Add("客戶訂單");
                             dt.Columns.Add("總數量");
@@ -229,6 +229,7 @@ namespace PACKINGLIST
                             dt.Columns.Add("買方名稱");
                             dt.Columns.Add("出貨人代號");
                             dt.Columns.Add("出貨人名稱");
+                            dt.Columns.Add("預計出貨日");
                             dt.Columns.Add("結帳月份");
                             dt.Columns.Add("起始箱號");
                             dt.Columns.Add("結束箱號");
@@ -405,18 +406,6 @@ namespace PACKINGLIST
             // 計算項目資料筆數，26是最大欄位數
             itemCount = itemCount + 26 + dataGridView1.Rows.Count;
 
-            //設定 excel 資料格式為 文字
-            //客戶物料(3)	品號(4)	品名(5) 單位(7) 內盒(11)	外箱(12)	訂單號碼(13)
-            /*
-            worksheet.Range["C7", "C" + itemCount.ToString()].NumberFormat = "@";
-            worksheet.Range["D7", "D" + itemCount.ToString()].NumberFormat = "@";
-            worksheet.Range["E7", "E" + itemCount.ToString()].NumberFormat = "@";
-            worksheet.Range["G7", "G" + itemCount.ToString()].NumberFormat = "@";
-            worksheet.Range["K7", "K" + itemCount.ToString()].NumberFormat = "@";
-            worksheet.Range["L7", "L" + itemCount.ToString()].NumberFormat = "@";
-            worksheet.Range["M7", "M" + itemCount.ToString()].NumberFormat = "@";
-             */
-
             //  excel 資料全部轉為文字 
             worksheet.Columns.EntireColumn.NumberFormat = "@";
             
@@ -496,7 +485,6 @@ namespace PACKINGLIST
             SBC.ColumnMappings.Add("客戶訂單", "DESC_NO");
             SBC.ColumnMappings.Add("品號", "ITEM_NBR");
             SBC.ColumnMappings.Add("品名", "ITEM_DESC");
-            //SBC.ColumnMappings.Add("例外參考號碼", "PANY_ITEM");
             SBC.ColumnMappings.Add("單位", "UN_DESC");
             SBC.ColumnMappings.Add("總數量", "QTY");
             SBC.ColumnMappings.Add("內盒", "IN_NBR");
