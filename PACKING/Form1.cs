@@ -337,7 +337,7 @@ namespace PACKINGLIST
                         dr["出貨人代號"] = shiperNum;
                         dr["出貨人名稱"] = shiperName;
                         dr["預計出貨日"] = Convert.ToDateTime(ITEM.GetString("EDATU")).ToString("yyyy/MM/dd");
-                        dr["結帳月份"] = Convert.ToDateTime(HEADER.GetString("VDATU")).ToString("yyyyMM");
+                        dr["結帳月份"] = Convert.ToDateTime(HEADER.GetString("EDATU")).ToString("yyyyMM");
                         dr["起始箱號"] = ctnNumStart;
                         dr["結束箱號"] = ctnNumEnd;
                         dr["單價"] = unitPrice;
@@ -354,26 +354,26 @@ namespace PACKINGLIST
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
             }
             //datatable加總
-            int totKwmeng = 0;
-            int totCtnQty = 0;
-            double totNtgew1 = 0.000;
-            double totNtgew2 = 0.000;
-            double totVolum1 = 0.000;
+            int sumTotQty = 0;
+            int sumTotCtnQty = 0;
+            double sumTotNetWeight = 0.000;
+            double sumTotGrossWeight = 0.000;
+            double sumTotVolume = 0.000;
             foreach (DataRow dr in dt.Rows)
             {
                 if (dr.RowState != DataRowState.Deleted)
-                    totKwmeng += Convert.ToInt32(dr["總數量"]);
-                    totCtnQty += Convert.ToInt32(dr["箱數"]);
-                    totNtgew1 += Convert.ToDouble(dr["總淨重"]);
-                    totNtgew2 += Convert.ToDouble(dr["總毛重"]);
-                    totVolum1 += Convert.ToDouble(dr["總才數"]);
+                    sumTotQty += Convert.ToInt32(dr["總數量"]);
+                    sumTotCtnQty += Convert.ToInt32(dr["箱數"]);
+                    sumTotNetWeight += Convert.ToDouble(dr["總淨重"]);
+                    sumTotGrossWeight += Convert.ToDouble(dr["總毛重"]);
+                    sumTotVolume += Convert.ToDouble(dr["總才數"]);
                 }
             
-            listBox1.Items.Add("總數量：" + totKwmeng);
-            listBox1.Items.Add("總箱數：" + totCtnQty);
-            listBox1.Items.Add("總淨重：" + totNtgew1.ToString("0.000")); // 小數會自動補0，格式為 1.000
-            listBox1.Items.Add("總毛重：" + totNtgew2.ToString("0.000"));
-            listBox1.Items.Add("總才數：" + totVolum1.ToString("0.000"));
+            listBox1.Items.Add("加總數量：" + sumTotQty);
+            listBox1.Items.Add("加總箱數：" + sumTotCtnQty);
+            listBox1.Items.Add("加總淨重：" + sumTotNetWeight.ToString("0.000")); // 小數會自動補0，格式為 1.000
+            listBox1.Items.Add("加總毛重：" + sumTotGrossWeight.ToString("0.000"));
+            listBox1.Items.Add("加總才數：" + sumTotVolume.ToString("0.000"));
         }
 
         private void btnClear_Click(object sender, EventArgs e)
