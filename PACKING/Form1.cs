@@ -49,7 +49,7 @@ namespace PACKINGLIST
         private void Form1_Load(object sender, EventArgs e)
         {
             dt.Clear();
-            listBox1.Items.Clear();
+            lbSalesText.Items.Clear();
         }
         
         DataTable dt = new DataTable();
@@ -57,7 +57,7 @@ namespace PACKINGLIST
         private void BtnSubmit_Click(object sender, EventArgs e)
         {
             dt.Clear();
-            listBox1.Items.Clear();
+            lbSalesText.Items.Clear();
             //使用者
             userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             //KEY
@@ -166,25 +166,19 @@ namespace PACKINGLIST
                         lblCusNum.Visible = true;
                         lblCusName.Text = "買方/出貨方 : " + buyerName + " / " + shiperName;
                         lblCusName.Visible = true;
-                        lblEstDeliveryDate.Text = "出貨日 : " + Convert.ToDateTime(paraDeliveryDate).ToString("yyyy/MM/dd");
                         lblEstDeliveryDate.Visible = true;
-                        //內文
-                        for (int t = 0; t < TLINE1.RowCount; t++)
+                        if (! string.IsNullOrEmpty(paraDeliveryDate))
+                        {                            
+                            lblEstDeliveryDate.Text = "第一交貨日 : " + paraDeliveryDate;
+                        } else
                         {
-                            TLINE1.CurrentIndex = t;
-                            listBox1.Items.Add(TLINE1.GetString("TDLINE"));
-                        }
-                        for (int t = 0; t < TLINE2.RowCount; t++)
-                        {
-                            TLINE2.CurrentIndex = t;
-                            listBox1.Items.Add(TLINE2.GetString("TDLINE"));
-                        }
-                        for (int t = 0; t < TLINE3.RowCount; t++)
-                        {
-                            TLINE3.CurrentIndex = t;
-                            listBox1.Items.Add(TLINE3.GetString("TDLINE"));
+                            lblEstDeliveryDate.Text = "第一交貨日未指定";
                         }
 
+                        //銷售內文
+                        addTLINEtoListbox(TLINE1);
+                        addTLINEtoListbox(TLINE2);
+                        addTLINEtoListbox(TLINE3);
                     }
 
                     for (int i = 0; i <= ITEM.RowCount - 1; i++)
@@ -364,11 +358,21 @@ namespace PACKINGLIST
                     sumTotVolume += Convert.ToDouble(dr["總才數"]);
                 }
             
-            listBox1.Items.Add("加總數量：" + sumTotQty);
-            listBox1.Items.Add("加總箱數：" + sumTotCtnQty);
-            listBox1.Items.Add("加總淨重：" + sumTotNetWeight.ToString("0.000")); // 小數會自動補0，格式為 1.000
-            listBox1.Items.Add("加總毛重：" + sumTotGrossWeight.ToString("0.000"));
-            listBox1.Items.Add("加總才數：" + sumTotVolume.ToString("0.000"));
+            lbSalesText.Items.Add("加總數量：" + sumTotQty);
+            lbSalesText.Items.Add("加總箱數：" + sumTotCtnQty);
+            lbSalesText.Items.Add("加總淨重：" + sumTotNetWeight.ToString("0.000")); // 小數會自動補0，格式為 1.000
+            lbSalesText.Items.Add("加總毛重：" + sumTotGrossWeight.ToString("0.000"));
+            lbSalesText.Items.Add("加總才數：" + sumTotVolume.ToString("0.000"));
+        }
+
+        private void addTLINEtoListbox(IRfcTable TLINE)
+        {
+            for (int t = 0; t < TLINE.RowCount; t++)
+            {
+                TLINE.CurrentIndex = t;
+                lbSalesText.Items.Add(TLINE.GetString("TDLINE"));
+                if (t == TLINE.RowCount - 1) lbSalesText.Items.Add("  "); //最後一筆資料之後加上分隔符號
+            }
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -435,9 +439,9 @@ namespace PACKINGLIST
             int textRowStart = itemDetailRowStart + dataGridView1.Rows.Count + 1;
 
             //內文
-            for (int s = 0; s < listBox1.Items.Count ; s++)  
+            for (int s = 0; s < lbSalesText.Items.Count ; s++)  
             {
-                worksheet.Cells[s + textRowStart, 1] = listBox1.Items[s].ToString();
+                worksheet.Cells[s + textRowStart, 1] = lbSalesText.Items[s].ToString();
             }
             if (File.Exists(desktopFolderPath + "\\包裝明細清單.xlsx"))
             {
