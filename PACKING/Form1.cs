@@ -30,7 +30,7 @@ namespace PACKINGLIST
             D_status = ALL[4];
 
             D_connIP = "192.168.0.15";
-            D_connClient = "300";
+            D_connClient = "620";
             D_connSID = "DEV";
             D_connUser = "DDIC";
             D_connPwd = "Ubn3dx";
@@ -65,8 +65,8 @@ namespace PACKINGLIST
 
             Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
             RfcConfigParameters rfcPara = new RfcConfigParameters();
-            
-            rfcPara.Add(RfcConfigParameters.Name, D_connSID );
+
+            rfcPara.Add(RfcConfigParameters.Name, D_connSID);
             rfcPara.Add(RfcConfigParameters.AppServerHost, D_connIP.ToString().Trim());
             rfcPara.Add(RfcConfigParameters.Client, D_connClient.ToString().Trim());
             rfcPara.Add(RfcConfigParameters.User, D_connUser.ToString().Trim());
@@ -75,7 +75,7 @@ namespace PACKINGLIST
             rfcPara.Add(RfcConfigParameters.Language, D_connLanguage.ToString().Trim());
             RfcDestination rfcDest = RfcDestinationManager.GetDestination(rfcPara);
             RfcRepository rfcRepo = rfcDest.Repository;
-            IRfcFunction rfcFMname = null;
+            IRfcFunction rfcFMname;
 
             //結束箱號暫存
             int tmpCoNumEnd = 0;
@@ -93,13 +93,13 @@ namespace PACKINGLIST
                 if (gvOrderInput.Rows[k - 1].Cells[1].Value != null)
                 {
                     paraDeliveryDate = gvOrderInput.Rows[k - 1].Cells[1].Value.ToString().Trim();
-                }
+                }               
                 //函數名稱
                 rfcFMname = rfcRepo.CreateFunction(D_connRFC);
 
                 //設置輸入參數
                 rfcFMname.SetValue("P_VBELN", paraOrderNumber);
-                if (paraDeliveryDate != null) rfcFMname.SetValue("P_EDATU", paraDeliveryDate);
+                if (! string.IsNullOrEmpty(paraDeliveryDate)) rfcFMname.SetValue("P_EDATU", paraDeliveryDate);
 
                 //調用RFC方法
                 rfcFMname.Invoke(rfcDest);
@@ -227,8 +227,8 @@ namespace PACKINGLIST
                             dt.Columns.Add("USERID");
                             dt.Columns.Add("原始單價");
                             dt.Columns.Add("客戶折價");
-
                         }
+
                         //index
                         HEADER.CurrentIndex = 0;
                         ITEM.CurrentIndex = i;
@@ -428,7 +428,7 @@ namespace PACKINGLIST
             int itemDetailRowStart = itemHeaderRowStart + 1;
 
             //項目
-            for (int x = 0; x < dataGridView1.Rows.Count - 1; x++)  //DATAGRID行 
+            for (int x = 0; x < dataGridView1.Rows.Count - 1; x++) 
             {                
                 for (int j = 0; j <= lastVisbleColumnCount; j++) 
                 {
