@@ -166,7 +166,7 @@ namespace PACKINGLIST
                         lblCusNum.Visible = true;
                         lblCusName.Text = "買方/出貨方 : " + buyerName + " / " + shiperName;
                         lblCusName.Visible = true;
-                        lblEstDeliveryDate.Text = "預計出貨日 : " + VDATU;
+                        lblEstDeliveryDate.Text = "出貨日 : " + Convert.ToDateTime(paraDeliveryDate).ToString("yyyy/MM/dd");
                         lblEstDeliveryDate.Visible = true;
                         //內文
                         for (int t = 0; t < TLINE1.RowCount; t++)
