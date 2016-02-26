@@ -108,22 +108,19 @@ namespace PACKINGLIST
                 string messageType = rfcFMname.GetValue("STYPE").ToString();
                 string messageStatus = rfcFMname.GetValue("STATUS").ToString();
 
-                // Declare message title. 
-                string dialogTitle = "";
+                string messageBoxTitle = "";
                 switch (messageType)
                 {
-                    case "S": dialogTitle = "成功"; break;
-                    case "E": dialogTitle = "錯誤"; break;
-                    case "W": dialogTitle = "警告"; break;
-                    case "I": dialogTitle = "資訊"; break;
-                    case "A": dialogTitle = "取消"; break;
+                    case "S": messageBoxTitle = "成功"; break;
+                    case "E": messageBoxTitle = "錯誤"; break;
+                    case "W": messageBoxTitle = "警告"; break;
+                    case "I": messageBoxTitle = "資訊"; break;
+                    case "A": messageBoxTitle = "取消"; break;
                 }
 
-                //MessageBox.Show(status, title);
                 if (messageStatus != "")
                 {
-                    MessageBox.Show(messageStatus, dialogTitle);
-                    //btnClear.PerformClick();
+                    MessageBox.Show(messageStatus, messageBoxTitle);
                 }
                 else
                 {
@@ -199,22 +196,22 @@ namespace PACKINGLIST
                             dt.Columns.Add("才數");
                             dt.Columns.Add("內盒");
                             dt.Columns.Add("外箱");
+                            dt.Columns.Add("客戶訂單");                            
                             dt.Columns.Add("訂單號碼");
-                            dt.Columns.Add("舊料號");
-                            dt.Columns.Add("客戶訂單");
+                            dt.Columns.Add("項次");
+                            dt.Columns.Add("預計出貨日");
+                            dt.Columns.Add("舊料號");                            
                             dt.Columns.Add("總數量");
                             dt.Columns.Add("總淨重");
                             dt.Columns.Add("總毛重");
                             dt.Columns.Add("總才數");
                             dt.Columns.Add("內盒舊品號");
-                            dt.Columns.Add("外箱舊品號");
-                            dt.Columns.Add("項次");
+                            dt.Columns.Add("外箱舊品號");                            
                             dt.Columns.Add("箱號");
                             dt.Columns.Add("包裝指示碼");     
                             dt.Columns.Add("滿箱數");
                             dt.Columns.Add("買方代號");
-                            dt.Columns.Add("買方名稱");
-                            dt.Columns.Add("預計出貨日");
+                            dt.Columns.Add("買方名稱");                            
 
                             // 以下資料不會轉出成 excel
                             dt.Columns.Add("出貨人代號");
@@ -340,7 +337,7 @@ namespace PACKINGLIST
 
                 dataGridView1.DataSource = dt.DefaultView;
                 dataGridView1.ReadOnly = true;
-                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+                Cursor.Current = Cursors.Default;
             }
             //datatable加總
             int sumTotQty = 0;
@@ -384,9 +381,9 @@ namespace PACKINGLIST
 
         private void btnConvert_Click(object sender, EventArgs e)
         {
-            //桌面路徑
+            Cursor.Current = Cursors.WaitCursor;
+
             string desktopFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
             Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
             Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
@@ -449,9 +446,10 @@ namespace PACKINGLIST
             }
             
             worksheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬 
-            workbook.SaveAs(desktopFolderPath + "\\包裝明細清單.xlsx", Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+            workbook.SaveAs(desktopFolderPath + "\\包裝明細清單.xlsx", Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
+                Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
             app.Quit();
-            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+            Cursor.Current = Cursors.Default;
             MessageBox.Show("轉檔完畢!", "資訊");
         }
 
