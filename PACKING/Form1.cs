@@ -182,38 +182,38 @@ namespace PACKINGLIST
                     {
                         DataRow dr = dt.NewRow();
 
-                        if (i == 0 && ! dt.Columns.Contains("起訖箱號"))
+                        if (i == 0)
                         {
-                            dt.Columns.Add("起訖箱號");
                             dt.Columns.Add("箱數");
+                            dt.Columns.Add("箱號");
                             dt.Columns.Add("客戶物料");
                             dt.Columns.Add("品號");
+                            dt.Columns.Add("舊料號");
                             dt.Columns.Add("品名");
-                            dt.Columns.Add("單箱數量");
-                            dt.Columns.Add("單位");
-                            dt.Columns.Add("淨重");
-                            dt.Columns.Add("毛重");
-                            dt.Columns.Add("才數");
-                            dt.Columns.Add("內盒");
-                            dt.Columns.Add("外箱");
-                            dt.Columns.Add("客戶訂單");                            
-                            dt.Columns.Add("訂單號碼");
-                            dt.Columns.Add("項次");
-                            dt.Columns.Add("預計出貨日");
-                            dt.Columns.Add("舊料號");                            
                             dt.Columns.Add("總數量");
                             dt.Columns.Add("總淨重");
                             dt.Columns.Add("總毛重");
                             dt.Columns.Add("總才數");
+                            dt.Columns.Add("單位");
+                            dt.Columns.Add("內盒");
                             dt.Columns.Add("內盒舊品號");
-                            dt.Columns.Add("外箱舊品號");                            
-                            dt.Columns.Add("箱號");
-                            dt.Columns.Add("包裝指示碼");     
-                            dt.Columns.Add("滿箱數");
-                            dt.Columns.Add("買方代號");
-                            dt.Columns.Add("買方名稱");                            
+                            dt.Columns.Add("外箱");
+                            dt.Columns.Add("外箱舊品號");
+                            dt.Columns.Add("客戶訂單");
+                            dt.Columns.Add("訂單號碼");
+                            dt.Columns.Add("項次");
+                            dt.Columns.Add("預計出貨日");
 
                             // 以下資料不會轉出成 excel
+                            dt.Columns.Add("起訖箱號");
+                            dt.Columns.Add("單箱數量");
+                            dt.Columns.Add("淨重");
+                            dt.Columns.Add("毛重");
+                            dt.Columns.Add("才數");
+                            dt.Columns.Add("包裝指示碼");
+                            dt.Columns.Add("滿箱數");
+                            dt.Columns.Add("買方代號");
+                            dt.Columns.Add("買方名稱");
                             dt.Columns.Add("出貨人代號");
                             dt.Columns.Add("出貨人名稱");                            
                             dt.Columns.Add("結帳月份");
@@ -292,7 +292,6 @@ namespace PACKINGLIST
                         //單價
                         string unitPrice = ITEM.GetString("U_PRICE").ToString();
 
-                        dr["起訖箱號"] = ctnNumStart + "~" + ctnNumEnd;
                         dr["箱數"] = ctnQty;
                         dr["客戶物料"] = cusMat;
                         dr["品號"] = matNum;
@@ -314,6 +313,7 @@ namespace PACKINGLIST
                         dr["內盒舊品號"] = boxOldMatNum;
                         dr["外箱舊品號"] = ctnOldMatNum;
                         dr["項次"] = itemNum;
+                        dr["起訖箱號"] = ctnNumStart + "~" + ctnNumEnd;
 
                         dr["箱號"] = ctnNumEnd;
                         dr["包裝指示碼"] = packingInstruc;
@@ -398,7 +398,7 @@ namespace PACKINGLIST
             int estDeliveryDateRow = 4;
             int packingKeyRow = 5;
             int firstColumnNum = 1;
-            int lastVisbleColumnCount = 27;
+            int lastVisbleColumnCount = 18;
             int itemHeaderRowStart = 7;
             int columnNum;
 
