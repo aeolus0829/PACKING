@@ -15,7 +15,7 @@ namespace PACKINGLIST
 {
     public partial class Form1 : Form
     {
-        string dbConnStr = "Data Source=SBSDB;Initial Catalog=PACKING_DEV;Uid=PACKING;Pwd=Admin12-1;";
+        string dbConnStr = "Data Source=SBSDB;Initial Catalog=PACKING;Uid=PACKING;Pwd=Admin12-1;";
         string pakTblNm = "dbo.PACKING";
         string cusTblNm = "dbo.CUSTOMS";
 
@@ -29,9 +29,9 @@ namespace PACKINGLIST
             string[] ALL = sapReportPrms.SQL();
             D_status = ALL[4];
 
-            D_connIP = "192.168.0.15";
-            D_connClient = "620";
-            D_connSID = "DEV";
+            D_connIP = "192.168.0.16";
+            D_connClient = "800";
+            D_connSID = "PRD";
             D_connUser = "DDIC";
             D_connPwd = "Ubn3dx";
             D_connRFC = "ZSDRFC002";
