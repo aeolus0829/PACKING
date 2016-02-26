@@ -191,10 +191,10 @@ namespace PACKINGLIST
                             dt.Columns.Add("舊料號");
                             dt.Columns.Add("品名");
                             dt.Columns.Add("總數量");
+                            dt.Columns.Add("單位");
                             dt.Columns.Add("總淨重");
                             dt.Columns.Add("總毛重");
-                            dt.Columns.Add("總才數");
-                            dt.Columns.Add("單位");
+                            dt.Columns.Add("總才數");                            
                             dt.Columns.Add("內盒");
                             dt.Columns.Add("內盒舊品號");
                             dt.Columns.Add("外箱");
