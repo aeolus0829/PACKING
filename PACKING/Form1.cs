@@ -181,8 +181,9 @@ namespace PACKINGLIST
                     for (int i = 0; i <= ITEM.RowCount - 1; i++)
                     {
                         DataRow dr = dt.NewRow();
+                        bool isHeaderExist = dt.Columns.Contains("箱數");
 
-                        if (i == 0)
+                        if (i == 0 && !isHeaderExist)
                         {
                             dt.Columns.Add("箱數");
                             dt.Columns.Add("箱號");
