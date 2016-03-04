@@ -203,9 +203,9 @@ namespace PACKINGLIST
                             dt.Columns.Add("客戶訂單");
                             dt.Columns.Add("訂單號碼");
                             dt.Columns.Add("項次");
-                            dt.Columns.Add("預計出貨日");
 
                             // 以下資料不會轉出成 excel
+                            dt.Columns.Add("預計出貨日");
                             dt.Columns.Add("起訖箱號");
                             dt.Columns.Add("單箱數量");
                             dt.Columns.Add("淨重");
@@ -399,7 +399,7 @@ namespace PACKINGLIST
             int estDeliveryDateRow = 4;
             int packingKeyRow = 5;
             int firstColumnNum = 1;
-            int lastVisbleColumnCount = 18;
+            int lastVisbleColumnCount = 17;
             int itemHeaderRowStart = 7;
             int columnNum;
 
