@@ -15,7 +15,7 @@ namespace PACKINGLIST
 {
     public partial class Form1 : Form
     {
-        string dbConnStr = "Data Source=SBSDB;Initial Catalog=PACKING;Uid=PACKING;Pwd=Admin12-1;";
+        string dbConnStr = "Data Source=SBSDB;Initial Catalog=PACKING_DEV;Uid=PACKING;Pwd=Admin12-1;";
         string pakTblNm = "dbo.PACKING";
         string cusTblNm = "dbo.CUSTOMS";
 
@@ -479,51 +479,62 @@ namespace PACKINGLIST
             }
         }
         private void bulkWriteToPacking(DataTable dataTable)
-        {                                    
+        {
             SqlConnection bulkConn = new SqlConnection(dbConnStr);
             SqlBulkCopy SBC = new SqlBulkCopy(bulkConn);
             SBC.DestinationTableName = pakTblNm;
-            
-            //對應資料行
-            SBC.ColumnMappings.Add("客戶物料", "CUS_ITEM");
-            SBC.ColumnMappings.Add("訂單號碼", "NBR");
-            SBC.ColumnMappings.Add("出貨人代號", "CUS_NBR");
-            SBC.ColumnMappings.Add("出貨人名稱", "CUS_ALIAS");
-            SBC.ColumnMappings.Add("預計出貨日", "DATE");
-            SBC.ColumnMappings.Add("結帳月份", "ACR_MON");
-            SBC.ColumnMappings.Add("客戶訂單", "DESC_NO");
-            SBC.ColumnMappings.Add("品號", "ITEM_NBR");
-            SBC.ColumnMappings.Add("品名", "ITEM_DESC");
-            SBC.ColumnMappings.Add("單位", "UN_DESC");
-            SBC.ColumnMappings.Add("總數量", "QTY");
-            SBC.ColumnMappings.Add("內盒", "IN_NBR");
-            SBC.ColumnMappings.Add("滿箱數", "IN_BOX");
-            SBC.ColumnMappings.Add("外箱", "PBOX_NBR");
-            SBC.ColumnMappings.Add("單箱數量", "QTY_PBOX");
-            SBC.ColumnMappings.Add("淨重", "N_WIGHT");
-            SBC.ColumnMappings.Add("總淨重", "TOTN_WIGHT");
-            SBC.ColumnMappings.Add("毛重", "G_WIGHT");
-            SBC.ColumnMappings.Add("總毛重", "TOTG_WIGHT");
-            SBC.ColumnMappings.Add("才數", "CUFT");
-            SBC.ColumnMappings.Add("總才數", "TOTCUFT");
-            SBC.ColumnMappings.Add("箱數", "PACK_QTY");
-            SBC.ColumnMappings.Add("起始箱號", "NO1");
-            SBC.ColumnMappings.Add("結束箱號", "NO2");
-            SBC.ColumnMappings.Add("箱號", "_NullFlags");
-            SBC.ColumnMappings.Add("項次", "POSNR");
-            SBC.ColumnMappings.Add("舊料號", "IHREZ_E");
-            SBC.ColumnMappings.Add("內盒舊品號", "BOX_O");
-            SBC.ColumnMappings.Add("外箱舊品號", "CTN_O");
-            SBC.ColumnMappings.Add("包裝指示碼", "POBJID");
-            SBC.ColumnMappings.Add("買方代號", "KUNNR_S");
-            SBC.ColumnMappings.Add("買方名稱", "NAME1_S");
-            SBC.ColumnMappings.Add("KEY", "KEY");
-            SBC.ColumnMappings.Add("USERID", "USERID");
 
-            bulkConn.Open();
-            SBC.WriteToServer(dataTable);
-            SBC.Close();
-            bulkConn.Close();
+            try
+            {
+                //對應資料行
+                SBC.ColumnMappings.Add("客戶物料", "CUS_ITEM");
+                SBC.ColumnMappings.Add("訂單號碼", "NBR");
+                SBC.ColumnMappings.Add("出貨人代號", "CUS_NBR");
+                SBC.ColumnMappings.Add("出貨人名稱", "CUS_ALIAS");
+                SBC.ColumnMappings.Add("預計出貨日", "DATE");
+                SBC.ColumnMappings.Add("結帳月份", "ACR_MON");
+                SBC.ColumnMappings.Add("客戶訂單", "DESC_NO");
+                SBC.ColumnMappings.Add("品號", "ITEM_NBR");
+                SBC.ColumnMappings.Add("品名", "ITEM_DESC");
+                SBC.ColumnMappings.Add("單位", "UN_DESC");
+                SBC.ColumnMappings.Add("總數量", "QTY");
+                SBC.ColumnMappings.Add("內盒", "IN_NBR");
+                SBC.ColumnMappings.Add("滿箱數", "IN_BOX");
+                SBC.ColumnMappings.Add("外箱", "PBOX_NBR");
+                SBC.ColumnMappings.Add("單箱數量", "QTY_PBOX");
+                SBC.ColumnMappings.Add("淨重", "N_WIGHT");
+                SBC.ColumnMappings.Add("總淨重", "TOTN_WIGHT");
+                SBC.ColumnMappings.Add("毛重", "G_WIGHT");
+                SBC.ColumnMappings.Add("總毛重", "TOTG_WIGHT");
+                SBC.ColumnMappings.Add("才數", "CUFT");
+                SBC.ColumnMappings.Add("總才數", "TOTCUFT");
+                SBC.ColumnMappings.Add("箱數", "PACK_QTY");
+                SBC.ColumnMappings.Add("起始箱號", "NO1");
+                SBC.ColumnMappings.Add("結束箱號", "NO2");
+                SBC.ColumnMappings.Add("箱號", "_NullFlags");
+                SBC.ColumnMappings.Add("項次", "POSNR");
+                SBC.ColumnMappings.Add("舊料號", "IHREZ_E");
+                SBC.ColumnMappings.Add("內盒舊品號", "BOX_O");
+                SBC.ColumnMappings.Add("外箱舊品號", "CTN_O");
+                SBC.ColumnMappings.Add("包裝指示碼", "POBJID");
+                SBC.ColumnMappings.Add("買方代號", "KUNNR_S");
+                SBC.ColumnMappings.Add("買方名稱", "NAME1_S");
+                SBC.ColumnMappings.Add("KEY", "KEY");
+                SBC.ColumnMappings.Add("USERID", "USERID");
+
+                bulkConn.Open();
+                SBC.WriteToServer(dataTable);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            finally
+            {
+                SBC.Close();
+                bulkConn.Close();
+            }
+            
         }
         private void bulkWriteToCustoms(DataTable dataTable)
         {
@@ -532,19 +543,25 @@ namespace PACKINGLIST
             SqlBulkCopy SBC = new SqlBulkCopy(bulkConn);
             SBC.DestinationTableName = cusTblNm;
 
-            //對應資料行
-            SBC.ColumnMappings.Add("KEY", "KEY");
-            SBC.ColumnMappings.Add("訂單號碼", "NBR");
-            SBC.ColumnMappings.Add("項次", "POSNR");
-            SBC.ColumnMappings.Add("單價", "PRICE");
-            SBC.ColumnMappings.Add("原始單價", "ORGNL");
-            SBC.ColumnMappings.Add("客戶折價", "DSCNT");
+            try
+            {
+                //對應資料行
+                SBC.ColumnMappings.Add("KEY", "KEY");
+                SBC.ColumnMappings.Add("訂單號碼", "NBR");
+                SBC.ColumnMappings.Add("項次", "POSNR");
+                SBC.ColumnMappings.Add("單價", "PRICE");
+                SBC.ColumnMappings.Add("原始單價", "ORGNL");
+                SBC.ColumnMappings.Add("客戶折價", "DSCNT");
 
-            bulkConn.Open();
-            SBC.WriteToServer(dt);
+                bulkConn.Open();
+                SBC.WriteToServer(dt);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
             SBC.Close();
             bulkConn.Close();
         }
-
     }
 }
