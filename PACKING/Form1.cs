@@ -15,7 +15,7 @@ namespace PACKINGLIST
 {
     public partial class Form1 : Form
     {
-        string dbConnStr = "Data Source=SBSDB;Initial Catalog=PACKING_DEV;Uid=PACKING;Pwd=Admin12-1;";
+        string dbConnStr = "Data Source=SBSDB;Initial Catalog=PACKING;Uid=PACKING;Pwd=Admin12-1;";
         string pakTblNm = "dbo.PACKING";
         string cusTblNm = "dbo.CUSTOMS";
 
@@ -321,10 +321,10 @@ namespace PACKINGLIST
                         dr["滿箱數"] = fullPackQty;
                         dr["買方代號"] = buyerNum;
                         dr["買方名稱"] = buyerName;
-                        dr["預計出貨日"] = Convert.ToDateTime(ITEM.GetString("EDATU")).ToString("yyyy/MM/dd");
+                        dr["預計出貨日"] = Convert.ToDateTime(ITEM.GetString("EDATU")).ToString("yyyyMMdd");
                         dr["出貨人代號"] = shiperNum;
                         dr["出貨人名稱"] = shiperName;                        
-                        dr["結帳月份"] = Convert.ToDateTime(ITEM.GetString("EDATU")).ToString("yyyy/MM");
+                        dr["結帳月份"] = Convert.ToDateTime(ITEM.GetString("EDATU")).ToString("yyyyMM");
                         dr["起始箱號"] = ctnNumStart;
                         dr["結束箱號"] = ctnNumEnd;
                         dr["單價"] = unitPrice;
