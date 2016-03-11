@@ -185,8 +185,8 @@ namespace PACKINGLIST
 
                         if (i == 0 && !isHeaderExist)
                         {
-                            dt.Columns.Add("箱數");
                             dt.Columns.Add("箱號");
+                            dt.Columns.Add("箱數");
                             dt.Columns.Add("客戶物料");
                             dt.Columns.Add("品號");
                             dt.Columns.Add("舊料號");
