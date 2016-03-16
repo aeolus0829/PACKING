@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using connDB;
 using System.Windows.Forms;
 
 using SAP.Middleware.Connector;
@@ -15,27 +16,28 @@ namespace PACKINGLIST
 {
     public partial class Form1 : Form
     {
-        string dbConnStr = "Data Source=SBSDB;Initial Catalog=PACKING;Uid=PACKING;Pwd=Admin12-1;";
-        string pakTblNm = "dbo.PACKING";
-        string cusTblNm = "dbo.CUSTOMS";
-
-        string D_connIP, D_connUser, D_connPwd, D_connClient, D_connLanguage, D_connSID, D_connRFC, D_status;
-        string userName, packingKey;
+        string D_status;
+        string userName, packingKey, dbConnStr;        
         int itemCount = 0;
         sapReportPrms sapReportPrms = new sapReportPrms();
 
+        //連線資訊
+        string msSqlInstance = "DEV";
+        string sapClient = "800";
+        string rfcFuncName = "ZSDRFC002";
+
+        //開發資訊
+        bool TESTING = true;
+        string winFormVersion = "1.11";
+
         public Form1()
         {
+            var mssqlConn = new mssqlConnClass();            
+
+            dbConnStr  = mssqlConn.toSBSDB(msSqlInstance);
+
             string[] ALL = sapReportPrms.SQL();
             D_status = ALL[4];
-
-            D_connIP = "192.168.0.16";
-            D_connClient = "800";
-            D_connSID = "PRD";
-            D_connUser = "DDIC";
-            D_connPwd = "Ubn3dx";
-            D_connRFC = "ZSDRFC002";
-            D_connLanguage = "ZF";
 
             if (D_status == "false")
             {
@@ -50,8 +52,11 @@ namespace PACKINGLIST
         {
             dt.Clear();
             lbSalesText.Items.Clear();
+            if (TESTING) this.Text += winFormVersion + " 測試版 " + "/ MSSQL: " + msSqlInstance + " / SAP資料環境: " + sapClient;
+            else this.Text += winFormVersion;
+
         }
-        
+
         DataTable dt = new DataTable();
 
         private void BtnSubmit_Click(object sender, EventArgs e)
@@ -64,18 +69,13 @@ namespace PACKINGLIST
             packingKey = DateTime.Now.ToString("yyyyMMdd").Trim() + DateTime.Now.ToString("HHmmss").Trim();
 
             Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-            RfcConfigParameters rfcPara = new RfcConfigParameters();
 
-            rfcPara.Add(RfcConfigParameters.Name, D_connSID);
-            rfcPara.Add(RfcConfigParameters.AppServerHost, D_connIP.ToString().Trim());
-            rfcPara.Add(RfcConfigParameters.Client, D_connClient.ToString().Trim());
-            rfcPara.Add(RfcConfigParameters.User, D_connUser.ToString().Trim());
-            rfcPara.Add(RfcConfigParameters.Password, D_connPwd.ToString().Trim());
-            rfcPara.Add(RfcConfigParameters.SystemNumber, "00");
-            rfcPara.Add(RfcConfigParameters.Language, D_connLanguage.ToString().Trim());
-            RfcDestination rfcDest = RfcDestinationManager.GetDestination(rfcPara);
-            RfcRepository rfcRepo = rfcDest.Repository;
-            IRfcFunction rfcFMname;
+            var sapConn = new sapConnClass();
+            var rfcPara = sapConn.setParaToConn(sapClient);
+            var rfcDest = RfcDestinationManager.GetDestination(rfcPara);
+            var rfcRepo = rfcDest.Repository;
+            var rfcFMname = rfcRepo.CreateFunction(rfcFuncName);
+
 
             //結束箱號暫存
             int tmpCoNumEnd = 0;
@@ -94,8 +94,6 @@ namespace PACKINGLIST
                 {
                     paraDeliveryDate = gvOrderInput.Rows[k - 1].Cells[1].Value.ToString().Trim();
                 }               
-                //函數名稱
-                rfcFMname = rfcRepo.CreateFunction(D_connRFC);
 
                 //設置輸入參數
                 rfcFMname.SetValue("P_VBELN", paraOrderNumber);
@@ -482,7 +480,7 @@ namespace PACKINGLIST
         {
             SqlConnection bulkConn = new SqlConnection(dbConnStr);
             SqlBulkCopy SBC = new SqlBulkCopy(bulkConn);
-            SBC.DestinationTableName = pakTblNm;
+            SBC.DestinationTableName = "dbo.PACKING";
 
             try
             {
@@ -538,10 +536,9 @@ namespace PACKINGLIST
         }
         private void bulkWriteToCustoms(DataTable dataTable)
         {
-
             SqlConnection bulkConn = new SqlConnection(dbConnStr);
             SqlBulkCopy SBC = new SqlBulkCopy(bulkConn);
-            SBC.DestinationTableName = cusTblNm;
+            SBC.DestinationTableName = "dbo.CUSTOMS";
 
             try
             {
