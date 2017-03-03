@@ -19,7 +19,6 @@ public class sapReportPrms
 
 
             public string[] SQL()
-
             {
             try
               {

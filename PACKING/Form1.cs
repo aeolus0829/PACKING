@@ -22,8 +22,8 @@ namespace PACKINGLIST
         sapReportPrms sapReportPrms = new sapReportPrms();
 
         //連線資訊
-        string msSqlInstance = "DEV";
-        string sapClient = "800";
+        string packingDB = "DEV";
+        string sapDB = "620";
         string rfcFuncName = "ZSDRFC002";
 
         //開發資訊
@@ -34,7 +34,7 @@ namespace PACKINGLIST
         {
             var mssqlConn = new mssqlConnClass();            
 
-            dbConnStr  = mssqlConn.toSBSDB(msSqlInstance);
+            dbConnStr  = mssqlConn.toSBSDB(packingDB);
 
             string[] ALL = sapReportPrms.SQL();
             D_status = ALL[4];
@@ -52,7 +52,7 @@ namespace PACKINGLIST
         {
             dt.Clear();
             lbSalesText.Items.Clear();
-            if (TESTING) this.Text += winFormVersion + " 測試版 " + "/ MSSQL: " + msSqlInstance + " / SAP資料環境: " + sapClient;
+            if (TESTING) this.Text += winFormVersion + " 測試版 " + "/ MSSQL: " + packingDB + " / SAP資料環境: " + sapDB;
             else this.Text += winFormVersion;
 
         }
@@ -71,7 +71,7 @@ namespace PACKINGLIST
             Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
             var sapConn = new sapConnClass();
-            var rfcPara = sapConn.setParaToConn(sapClient);
+            var rfcPara = sapConn.setParaToConn(sapDB);
             var rfcDest = RfcDestinationManager.GetDestination(rfcPara);
             var rfcRepo = rfcDest.Repository;
             var rfcFMname = rfcRepo.CreateFunction(rfcFuncName);

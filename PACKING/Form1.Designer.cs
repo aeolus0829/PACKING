@@ -40,15 +40,15 @@
             this.btnConvert = new System.Windows.Forms.Button();
             this.txtVbeln = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.txtEdatu = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.listBox1 = new System.Windows.Forms.ListBox();
-            this.lblVdatu = new System.Windows.Forms.Label();
-            this.lblName1 = new System.Windows.Forms.Label();
-            this.lblKunnr = new System.Windows.Forms.Label();
-            this.gvSelectOption = new System.Windows.Forms.DataGridView();
+            this.lbSalesText = new System.Windows.Forms.ListBox();
+            this.lblEstDeliveryDate = new System.Windows.Forms.Label();
+            this.lblCusName = new System.Windows.Forms.Label();
+            this.lblCusNum = new System.Windows.Forms.Label();
+            this.gvOrderInput = new System.Windows.Forms.DataGridView();
             this.btnTodb = new System.Windows.Forms.Button();
-            this.lblVbeln = new System.Windows.Forms.Label();
+            this.lblOrderNum = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gvSelectOption)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvOrderInput)).BeginInit();
             this.SuspendLayout();
             // 
             // btnClear
@@ -78,7 +78,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -87,7 +87,7 @@
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
             dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -97,7 +97,7 @@
             this.dataGridView1.Name = "dataGridView1";
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
@@ -129,86 +129,83 @@
             this.txtEdatu.Name = "txtEdatu";
             this.txtEdatu.Width = 90;
             // 
-            // listBox1
+            // lbSalesText
             // 
-            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.lbSalesText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 12;
-            this.listBox1.Location = new System.Drawing.Point(12, 583);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(990, 148);
-            this.listBox1.TabIndex = 74;
+            this.lbSalesText.FormattingEnabled = true;
+            this.lbSalesText.ItemHeight = 12;
+            this.lbSalesText.Location = new System.Drawing.Point(12, 583);
+            this.lbSalesText.Name = "lbSalesText";
+            this.lbSalesText.Size = new System.Drawing.Size(990, 148);
+            this.lbSalesText.TabIndex = 74;
             // 
-            // lblVdatu
+            // lblEstDeliveryDate
             // 
-            this.lblVdatu.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lblVdatu.AutoSize = true;
-            this.lblVdatu.Font = new System.Drawing.Font("新細明體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.lblVdatu.Location = new System.Drawing.Point(712, 145);
-            this.lblVdatu.Name = "lblVdatu";
-            this.lblVdatu.Size = new System.Drawing.Size(0, 13);
-            this.lblVdatu.TabIndex = 77;
-            this.lblVdatu.Visible = false;
+            this.lblEstDeliveryDate.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblEstDeliveryDate.AutoSize = true;
+            this.lblEstDeliveryDate.Font = new System.Drawing.Font("PMingLiU", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.lblEstDeliveryDate.Location = new System.Drawing.Point(712, 145);
+            this.lblEstDeliveryDate.Name = "lblEstDeliveryDate";
+            this.lblEstDeliveryDate.Size = new System.Drawing.Size(0, 13);
+            this.lblEstDeliveryDate.TabIndex = 77;
             // 
-            // lblName1
+            // lblCusName
             // 
-            this.lblName1.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lblName1.AutoSize = true;
-            this.lblName1.Font = new System.Drawing.Font("新細明體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.lblName1.Location = new System.Drawing.Point(712, 117);
-            this.lblName1.Name = "lblName1";
-            this.lblName1.Size = new System.Drawing.Size(0, 13);
-            this.lblName1.TabIndex = 78;
-            this.lblName1.Visible = false;
+            this.lblCusName.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblCusName.AutoSize = true;
+            this.lblCusName.Font = new System.Drawing.Font("PMingLiU", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.lblCusName.Location = new System.Drawing.Point(712, 117);
+            this.lblCusName.Name = "lblCusName";
+            this.lblCusName.Size = new System.Drawing.Size(0, 13);
+            this.lblCusName.TabIndex = 78;
             // 
-            // lblKunnr
+            // lblCusNum
             // 
-            this.lblKunnr.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lblKunnr.AutoSize = true;
-            this.lblKunnr.Font = new System.Drawing.Font("新細明體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.lblKunnr.Location = new System.Drawing.Point(712, 90);
-            this.lblKunnr.Name = "lblKunnr";
-            this.lblKunnr.Size = new System.Drawing.Size(0, 13);
-            this.lblKunnr.TabIndex = 75;
-            this.lblKunnr.Visible = false;
+            this.lblCusNum.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblCusNum.AutoSize = true;
+            this.lblCusNum.Font = new System.Drawing.Font("PMingLiU", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.lblCusNum.Location = new System.Drawing.Point(712, 90);
+            this.lblCusNum.Name = "lblCusNum";
+            this.lblCusNum.Size = new System.Drawing.Size(0, 13);
+            this.lblCusNum.TabIndex = 75;
             // 
-            // gvSelectOption
+            // gvOrderInput
             // 
-            this.gvSelectOption.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
+            this.gvOrderInput.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gvSelectOption.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
-            this.gvSelectOption.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gvSelectOption.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.gvOrderInput.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            this.gvOrderInput.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gvOrderInput.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.txtVbeln,
             this.txtEdatu});
             dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
             dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gvSelectOption.DefaultCellStyle = dataGridViewCellStyle5;
-            this.gvSelectOption.Location = new System.Drawing.Point(12, 9);
-            this.gvSelectOption.Name = "gvSelectOption";
+            this.gvOrderInput.DefaultCellStyle = dataGridViewCellStyle5;
+            this.gvOrderInput.Location = new System.Drawing.Point(12, 9);
+            this.gvOrderInput.Name = "gvOrderInput";
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("PMingLiU", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
             dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.gvSelectOption.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
-            this.gvSelectOption.RowTemplate.Height = 24;
-            this.gvSelectOption.Size = new System.Drawing.Size(204, 119);
-            this.gvSelectOption.TabIndex = 70;
+            this.gvOrderInput.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            this.gvOrderInput.RowTemplate.Height = 24;
+            this.gvOrderInput.Size = new System.Drawing.Size(204, 119);
+            this.gvOrderInput.TabIndex = 70;
             // 
             // btnTodb
             // 
@@ -220,16 +217,16 @@
             this.btnTodb.UseVisualStyleBackColor = true;
             this.btnTodb.Click += new System.EventHandler(this.btnTodb_Click);
             // 
-            // lblVbeln
+            // lblOrderNum
             // 
-            this.lblVbeln.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lblVbeln.AutoSize = true;
-            this.lblVbeln.Font = new System.Drawing.Font("新細明體", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.lblVbeln.Location = new System.Drawing.Point(712, 65);
-            this.lblVbeln.Name = "lblVbeln";
-            this.lblVbeln.Size = new System.Drawing.Size(0, 13);
-            this.lblVbeln.TabIndex = 76;
-            this.lblVbeln.Visible = false;
+            this.lblOrderNum.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lblOrderNum.AutoSize = true;
+            this.lblOrderNum.Font = new System.Drawing.Font("PMingLiU", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.lblOrderNum.Location = new System.Drawing.Point(712, 65);
+            this.lblOrderNum.Name = "lblOrderNum";
+            this.lblOrderNum.Size = new System.Drawing.Size(0, 13);
+            this.lblOrderNum.TabIndex = 76;
+            this.lblOrderNum.Visible = false;
             // 
             // Form1
             // 
@@ -240,18 +237,18 @@
             this.Controls.Add(this.BtnSubmit);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.btnConvert);
-            this.Controls.Add(this.listBox1);
-            this.Controls.Add(this.lblVdatu);
-            this.Controls.Add(this.lblName1);
-            this.Controls.Add(this.lblKunnr);
-            this.Controls.Add(this.gvSelectOption);
+            this.Controls.Add(this.lbSalesText);
+            this.Controls.Add(this.lblEstDeliveryDate);
+            this.Controls.Add(this.lblCusName);
+            this.Controls.Add(this.lblCusNum);
+            this.Controls.Add(this.gvOrderInput);
             this.Controls.Add(this.btnTodb);
-            this.Controls.Add(this.lblVbeln);
+            this.Controls.Add(this.lblOrderNum);
             this.Name = "Form1";
-            this.Text = "PACKING 1.01";
+            this.Text = "PACKING ";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gvSelectOption)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gvOrderInput)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -265,13 +262,13 @@
         private System.Windows.Forms.Button btnConvert;
         private System.Windows.Forms.DataGridViewTextBoxColumn txtVbeln;
         private System.Windows.Forms.DataGridViewTextBoxColumn txtEdatu;
-        private System.Windows.Forms.ListBox listBox1;
-        private System.Windows.Forms.Label lblVdatu;
-        private System.Windows.Forms.Label lblName1;
-        private System.Windows.Forms.Label lblKunnr;
-        private System.Windows.Forms.DataGridView gvSelectOption;
+        private System.Windows.Forms.ListBox lbSalesText;
+        private System.Windows.Forms.Label lblEstDeliveryDate;
+        private System.Windows.Forms.Label lblCusName;
+        private System.Windows.Forms.Label lblCusNum;
+        private System.Windows.Forms.DataGridView gvOrderInput;
         private System.Windows.Forms.Button btnTodb;
-        private System.Windows.Forms.Label lblVbeln;
+        private System.Windows.Forms.Label lblOrderNum;
     }
 }
 
