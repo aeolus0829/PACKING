@@ -47,8 +47,11 @@
             this.gvOrderInput = new System.Windows.Forms.DataGridView();
             this.btnTodb = new System.Windows.Forms.Button();
             this.lblOrderNum = new System.Windows.Forms.Label();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.tsLabel = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvOrderInput)).BeginInit();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnClear
@@ -228,11 +231,27 @@
             this.lblOrderNum.TabIndex = 76;
             this.lblOrderNum.Visible = false;
             // 
+            // statusStrip
+            // 
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsLabel});
+            this.statusStrip.Location = new System.Drawing.Point(0, 717);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.Size = new System.Drawing.Size(1014, 22);
+            this.statusStrip.TabIndex = 79;
+            this.statusStrip.Text = "statusStrip1";
+            // 
+            // tsLabel
+            // 
+            this.tsLabel.Name = "tsLabel";
+            this.tsLabel.Size = new System.Drawing.Size(0, 17);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1014, 739);
+            this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.btnClear);
             this.Controls.Add(this.BtnSubmit);
             this.Controls.Add(this.dataGridView1);
@@ -249,6 +268,8 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gvOrderInput)).EndInit();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -269,6 +290,8 @@
         private System.Windows.Forms.DataGridView gvOrderInput;
         private System.Windows.Forms.Button btnTodb;
         private System.Windows.Forms.Label lblOrderNum;
+        private System.Windows.Forms.StatusStrip statusStrip;
+        private System.Windows.Forms.ToolStripStatusLabel tsLabel;
     }
 }
 
