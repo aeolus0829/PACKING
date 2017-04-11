@@ -401,12 +401,12 @@ namespace PACKINGLIST
             int itemHeaderRowStart = 7;
             int columnNum;
 
-            // 將買方基本資料，放置於工作表左上角，[第一列，第一行]
+            // 將包裝單號，放置於工作表左上角，[第一列，第一行]
+            worksheet.Cells[packingKeyRow, firstColumnNum] = "包裝單號： " + packingKey;
             worksheet.Cells[orderNumRow, firstColumnNum] = lblOrderNum.Text;
             worksheet.Cells[cusNumRow, firstColumnNum] = lblCusNum.Text;
             worksheet.Cells[cusNameRow, firstColumnNum] = lblCusName.Text;
             worksheet.Cells[estDeliveryDateRow, firstColumnNum] = lblEstDeliveryDate.Text;
-            worksheet.Cells[packingKeyRow, firstColumnNum] = "包裝單號：" + packingKey;
 
             // 計算項目資料筆數，lastVisbleColumnCount 是允許出貨組看到的最大欄位數
             itemCount = itemCount + lastVisbleColumnCount + dataGridView1.Rows.Count;
