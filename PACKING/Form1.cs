@@ -11,6 +11,8 @@ using connDB;
 using System.Windows.Forms;
 
 using SAP.Middleware.Connector;
+using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace PACKINGLIST
 {
@@ -363,12 +365,24 @@ namespace PACKINGLIST
 
         private void addTLINEtoListbox(IRfcTable TLINE)
         {
-            for (int t = 0; t < TLINE.RowCount; t++)
+            for (int tCount = 0; tCount < TLINE.RowCount; tCount++)
             {
-                TLINE.CurrentIndex = t;
-                lbSalesText.Items.Add(TLINE.GetString("TDLINE"));
-                if (t == TLINE.RowCount - 1) lbSalesText.Items.Add("  "); //最後一筆資料之後加上分隔符號
+                TLINE.CurrentIndex = tCount;
+                string fixedTline = proceTline(TLINE.GetString("TDLINE").ToString());
+                lbSalesText.Items.Add(fixedTline);
+                if (tCount == TLINE.RowCount - 1) lbSalesText.Items.Add("  "); //最後一筆資料之後加上分隔符號
             }
+        }
+
+        private string proceTline(string inputText)
+        {
+            string regPattern, fixedText;
+
+            regPattern = "*<.>*";
+            Regex rx = new Regex(regPattern);
+            fixedText = rx.Replace(inputText, regPattern);
+
+            return fixedText;
         }
 
         private void btnClear_Click(object sender, EventArgs e)
