@@ -140,7 +140,7 @@
             this.lbSalesText.ItemHeight = 12;
             this.lbSalesText.Location = new System.Drawing.Point(12, 583);
             this.lbSalesText.Name = "lbSalesText";
-            this.lbSalesText.Size = new System.Drawing.Size(990, 148);
+            this.lbSalesText.Size = new System.Drawing.Size(990, 124);
             this.lbSalesText.TabIndex = 74;
             // 
             // lblEstDeliveryDate
@@ -207,7 +207,7 @@
             dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.gvOrderInput.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.gvOrderInput.RowTemplate.Height = 24;
-            this.gvOrderInput.Size = new System.Drawing.Size(204, 119);
+            this.gvOrderInput.Size = new System.Drawing.Size(211, 119);
             this.gvOrderInput.TabIndex = 70;
             // 
             // btnTodb
@@ -239,7 +239,6 @@
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(1014, 22);
             this.statusStrip.TabIndex = 79;
-            this.statusStrip.Text = "statusStrip1";
             // 
             // tsLabel
             // 

@@ -130,7 +130,6 @@ namespace PACKINGLIST
                     IRfcTable TLINE2 = rfcFMname.GetTable("TLINE2");
                     IRfcTable TLINE3 = rfcFMname.GetTable("TLINE3");
 
-
                     //当前内表的索引行
                     HEADER.CurrentIndex = 0;
                     //訂單號碼
@@ -368,7 +367,9 @@ namespace PACKINGLIST
             for (int tCount = 0; tCount < TLINE.RowCount; tCount++)
             {
                 TLINE.CurrentIndex = tCount;
-                string fixedTline = proceTline(TLINE.GetString("TDLINE").ToString());
+                string fixedTline = proceTline(TLINE.GetString("TDLINE"));
+
+
                 lbSalesText.Items.Add(fixedTline);
                 if (tCount == TLINE.RowCount - 1) lbSalesText.Items.Add("  "); //最後一筆資料之後加上分隔符號
             }
@@ -376,11 +377,13 @@ namespace PACKINGLIST
 
         private string proceTline(string inputText)
         {
-            string regPattern, fixedText;
+            string regPattern, fixedText, replaceWith;
 
-            regPattern = "*<.>*";
+            regPattern = "<\\(>.*<\\)>";
+            replaceWith = " ";
             Regex rx = new Regex(regPattern);
-            fixedText = rx.Replace(inputText, regPattern);
+
+            fixedText = rx.Replace(inputText, replaceWith);
 
             return fixedText;
         }
@@ -404,12 +407,15 @@ namespace PACKINGLIST
             worksheet = workbook.Sheets["工作表1"];
             worksheet = workbook.ActiveSheet;
             worksheet.Name = "訂單包裝明細";
+            string excelFileName = worksheet.Name + ".xlsx";
+            string fullPathToExcel = desktopFolderPath + "\\" + excelFileName;
 
-            int orderNumRow = 1;
-            int cusNumRow= 2;
-            int cusNameRow = 3;
-            int estDeliveryDateRow = 4;
-            int packingKeyRow = 5;
+            int packingKeyRow = 1;
+            int orderNumRow = 2;
+            int cusNumRow= 3;
+            int cusNameRow = 4;
+            int estDeliveryDateRow = 5;
+
             int firstColumnNum = 1;
             int lastVisbleColumnCount = 17;
             int itemHeaderRowStart = 7;
@@ -427,7 +433,22 @@ namespace PACKINGLIST
 
             //  excel 資料全部轉為文字 
             worksheet.Columns.EntireColumn.NumberFormat = "@";
-            
+
+            int itemDetailRowStart = itemHeaderRowStart + 1;
+            int textRowStart = itemDetailRowStart + dataGridView1.Rows.Count + 1;
+
+            //項目
+            for (int x = 0; x < dataGridView1.Rows.Count - 1; x++)
+            {
+                for (int j = 0; j <= lastVisbleColumnCount; j++)
+                {
+                    worksheet.Cells[x + itemDetailRowStart, j + 1] = dataGridView1.Rows[x].Cells[j].Value.ToString();
+                }
+            }
+
+            // worksheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬 
+
+
             //表頭
             for (int i = 0; i <= lastVisbleColumnCount ; i++) 
             {
@@ -435,35 +456,32 @@ namespace PACKINGLIST
                 worksheet.Cells[itemHeaderRowStart, columnNum] = dataGridView1.Columns[i].HeaderText;
             }
 
-            int itemDetailRowStart = itemHeaderRowStart + 1;
-
-            //項目
-            for (int x = 0; x < dataGridView1.Rows.Count - 1; x++) 
-            {                
-                for (int j = 0; j <= lastVisbleColumnCount; j++) 
-                {
-                    worksheet.Cells[x + itemDetailRowStart, j+1] = dataGridView1.Rows[x].Cells[j].Value.ToString();
-                }
-            }
-
-            int textRowStart = itemDetailRowStart + dataGridView1.Rows.Count + 1;
-
             //內文
             for (int s = 0; s < lbSalesText.Items.Count ; s++)  
             {
                 worksheet.Cells[s + textRowStart, 1] = lbSalesText.Items[s].ToString();
             }
-            if (File.Exists(desktopFolderPath + "\\包裝明細清單.xlsx"))
+            if (File.Exists(fullPathToExcel))
             {
-                File.Delete(desktopFolderPath + "\\包裝明細清單.xlsx");
+                try
+                {
+                    File.Delete(fullPathToExcel);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("檔案已存在，無法覆蓋，原檔案有開著嗎？","錯誤");
+                }
+                
             }
             
-            worksheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬 
-            workbook.SaveAs(desktopFolderPath + "\\包裝明細清單.xlsx", Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
+            workbook.SaveAs(fullPathToExcel, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
                 Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
             app.Quit();
             Cursor.Current = Cursors.Default;
-            MessageBox.Show("轉檔完畢!", "資訊");
+
+            tsLabel.Text = "轉檔已完成！放在 " + fullPathToExcel;
+
+            //MessageBox.Show("轉檔完畢!", "資訊");
         }
 
        
@@ -483,11 +501,18 @@ namespace PACKINGLIST
                 //寫入 CUSTOMS table
                 bulkWriteToCustoms(dt);
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+
+                tsLabel.Text = "資料已寫入資料庫，鍵值為：" + packingKey + "，已自動複製到剪貼簿！";
+
+                Clipboard.SetText(packingKey);
+
+                /*
                 DialogResult dr = MessageBox.Show("資料已寫入資料庫" + Environment.NewLine + "鍵值為：" + packingKey, "資訊");
                 if (dr == DialogResult.OK)
                 {
                     btnClear.PerformClick();
                 }
+                */
             }
         }
         private void bulkWriteToPacking(DataTable dataTable)
