@@ -450,16 +450,12 @@ namespace PACKINGLIST
             worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets.get_Item(1);
 
             //將資料貼入第七列 (前面是表頭資訊)
-            Microsoft.Office.Interop.Excel.Range workRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[7, 1];
+            Microsoft.Office.Interop.Excel.Range itemRangeStart = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[7, 1];
 
-            workRange.Select();
+            itemRangeStart.Select();
 
             //從剪貼薄貼上
-            worksheet.PasteSpecial(workRange, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
-
-
-            // worksheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬 
-
+            worksheet.PasteSpecial(itemRangeStart, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
 
             //表頭
             for (int i = 0; i <= lastVisbleColumnCount ; i++) 
@@ -485,7 +481,11 @@ namespace PACKINGLIST
                 }
                 
             }
-            
+
+            worksheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬
+            ((Microsoft.Office.Interop.Excel.Range)worksheet.Columns["A:B", System.Type.Missing]).ColumnWidth = 8;
+
+
             workbook.SaveAs(fullPathToExcel, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
                 Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
             app.Quit();
