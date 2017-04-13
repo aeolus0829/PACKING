@@ -438,13 +438,25 @@ namespace PACKINGLIST
             int textRowStart = itemDetailRowStart + dataGridView1.Rows.Count + 1;
 
             //項目
-            for (int x = 0; x < dataGridView1.Rows.Count - 1; x++)
-            {
-                for (int j = 0; j <= lastVisbleColumnCount; j++)
-                {
-                    worksheet.Cells[x + itemDetailRowStart, j + 1] = dataGridView1.Rows[x].Cells[j].Value.ToString();
-                }
-            }
+            //宣告 datagrid 沒有標題列
+            dataGridView1.RowHeadersVisible = false;
+
+            //將資料從 datagrid 貼到 object 
+            dataGridView1.SelectAll();
+            DataObject dobj = dataGridView1.GetClipboardContent();
+            if (dobj != null) Clipboard.SetDataObject(dobj);
+
+            //將 object 傳給 workbook
+            worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets.get_Item(1);
+
+            //將資料貼入第七列 (前面是表頭資訊)
+            Microsoft.Office.Interop.Excel.Range workRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[7, 1];
+
+            workRange.Select();
+
+            //從剪貼薄貼上
+            worksheet.PasteSpecial(workRange, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
+
 
             // worksheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬 
 
