@@ -30,7 +30,7 @@ namespace PACKINGLIST
 
         //開發資訊
         bool TESTING = true;
-        string winFormVersion = "1.11";
+        string winFormVersion = "1.12";
 
         public Form1()
         {
