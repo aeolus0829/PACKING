@@ -403,7 +403,9 @@ namespace PACKINGLIST
             Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
             Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
-            
+
+            app.Visible = false;  // excel 程式是否顯示
+
             worksheet = workbook.Sheets["工作表1"];
             worksheet = workbook.ActiveSheet;
             worksheet.Name = "訂單包裝明細";
@@ -419,6 +421,7 @@ namespace PACKINGLIST
             int firstColumnNum = 1;
             int lastVisbleColumnCount = 17;
             int itemHeaderRowStart = 7;
+            int itemBodyRowStart = 8;
             int columnNum;
 
             // 將包裝單號，放置於工作表左上角，[第一列，第一行]
@@ -437,12 +440,21 @@ namespace PACKINGLIST
             int itemDetailRowStart = itemHeaderRowStart + 1;
             int textRowStart = itemDetailRowStart + dataGridView1.Rows.Count + 1;
 
+          
+            //表頭
+            for (int i = 0; i <= lastVisbleColumnCount ; i++) 
+            {
+                columnNum = i + 1;
+                worksheet.Cells[itemHeaderRowStart, columnNum] = dataGridView1.Columns[i].HeaderText;
+            }
+
             //項目
             //宣告 datagrid 沒有標題列
             dataGridView1.RowHeadersVisible = false;
 
             //將資料從 datagrid 貼到 object 
             dataGridView1.SelectAll();
+
             DataObject dobj = dataGridView1.GetClipboardContent();
             if (dobj != null) Clipboard.SetDataObject(dobj);
 
@@ -450,19 +462,22 @@ namespace PACKINGLIST
             worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets.get_Item(1);
 
             //將資料貼入第七列 (前面是表頭資訊)
-            Microsoft.Office.Interop.Excel.Range itemRangeStart = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[7, 1];
-
+            Microsoft.Office.Interop.Excel.Range itemRangeStart = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[itemBodyRowStart, firstColumnNum];
             itemRangeStart.Select();
 
             //從剪貼薄貼上
             worksheet.PasteSpecial(itemRangeStart, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
 
-            //表頭
-            for (int i = 0; i <= lastVisbleColumnCount ; i++) 
+            //清除不需要資料的欄位
+            worksheet.Range["S" + itemBodyRowStart + ":AL" + dataGridView1.Rows.Count+ itemBodyRowStart].Clear();
+           
+            int borderRange = dataGridView1.Rows.Count + itemHeaderRowStart;
+
+            for (int i = itemHeaderRowStart; i < borderRange; i++)
             {
-                columnNum = i + 1;
-                worksheet.Cells[itemHeaderRowStart, columnNum] = dataGridView1.Columns[i].HeaderText;
-            }
+                //標註列，加上底線
+                worksheet.Range["A" + i + ":R" + i].Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+            }          
 
             //內文
             for (int s = 0; s < lbSalesText.Items.Count ; s++)  
@@ -507,12 +522,12 @@ namespace PACKINGLIST
             }
             else
             {
-                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+                Cursor.Current = Cursors.WaitCursor;
                 //寫入 PACKING table
                 bulkWriteToPacking(dt);
                 //寫入 CUSTOMS table
                 bulkWriteToCustoms(dt);
-                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+                Cursor.Current = Cursors.Default;
 
                 tsLabel.Text = "資料已寫入資料庫，鍵值為：" + packingKey + "，已自動複製到剪貼簿！";
 
