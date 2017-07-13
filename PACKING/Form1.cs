@@ -20,11 +20,12 @@ namespace PACKINGLIST
         sapReportPrms sapReportPrms = new sapReportPrms();
 
         //連線資訊
-        string rfcFuncName = "ZSDRFC002";
+        string getPackingData = "ZSDRFC002";
+        string getLabelData = "ZSDRFC009";
 
         //開發資訊
         bool isTesting = true;
-
+        string formName = "PACKING";
         string winFormVersion = "1.12";
 
         public Form1()
@@ -32,6 +33,8 @@ namespace PACKINGLIST
             setConnEev(isTesting);
 
             var mssqlConn = new mssqlConnClass();            
+            
+            
 
             dbConnStr  = mssqlConn.toSBSDB(packingDB);
 
@@ -70,12 +73,21 @@ namespace PACKINGLIST
             if (isTesting) this.Text += winFormVersion + " 測試版 " + "/ MSSQL: " + packingDB + " / SAP資料環境: " + sapDB;
             else this.Text += winFormVersion;
 
+            sapConn = new sapConnClass();
+            rfcPara = sapConn.setParaToConn(sapDB);
+            rfcDest = RfcDestinationManager.GetDestination(rfcPara);
+            rfcRepo = rfcDest.Repository;
+
         }
 
         System.Data.DataTable dt = new System.Data.DataTable();
 
         public string packingDB { get; private set; }
         public string sapDB { get; private set; }
+        internal sapConnClass sapConn { get; private set; }
+        public RfcConfigParameters rfcPara { get; private set; }
+        public RfcDestination rfcDest { get; private set; }
+        public RfcRepository rfcRepo { get; private set; }
 
         private void BtnSubmit_Click(object sender, EventArgs e)
         {
@@ -87,12 +99,6 @@ namespace PACKINGLIST
             packingKey = DateTime.Now.ToString("yyyyMMdd").Trim() + DateTime.Now.ToString("HHmmss").Trim();
 
             Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-
-            var sapConn = new sapConnClass();
-            var rfcPara = sapConn.setParaToConn(sapDB);
-            var rfcDest = RfcDestinationManager.GetDestination(rfcPara);
-            var rfcRepo = rfcDest.Repository;
-            var rfcFMname = rfcRepo.CreateFunction(rfcFuncName);
 
             //結束箱號暫存
             int tmpCoNumEnd = 0;
@@ -110,18 +116,20 @@ namespace PACKINGLIST
                 if (gvOrderInput.Rows[k - 1].Cells[1].Value != null)
                 {
                     paraDeliveryDate = gvOrderInput.Rows[k - 1].Cells[1].Value.ToString().Trim();
-                }               
+                }
+
+                var rfcGetPackingFM = rfcRepo.CreateFunction(getPackingData);
 
                 //設置輸入參數
-                rfcFMname.SetValue("P_VBELN", paraOrderNumber);
-                if (! string.IsNullOrEmpty(paraDeliveryDate)) rfcFMname.SetValue("P_EDATU", paraDeliveryDate);
+                rfcGetPackingFM.SetValue("P_VBELN", paraOrderNumber);
+                if (! string.IsNullOrEmpty(paraDeliveryDate)) rfcGetPackingFM.SetValue("P_EDATU", paraDeliveryDate);
 
                 //調用RFC方法
-                rfcFMname.Invoke(rfcDest);
+                rfcGetPackingFM.Invoke(rfcDest);
 
                 //輸出參數
-                string messageType = rfcFMname.GetValue("STYPE").ToString();
-                string messageStatus = rfcFMname.GetValue("STATUS").ToString();
+                string messageType = rfcGetPackingFM.GetValue("STYPE").ToString();
+                string messageStatus = rfcGetPackingFM.GetValue("STATUS").ToString();
 
                 string messageBoxTitle = "";
                 switch (messageType)
@@ -139,11 +147,11 @@ namespace PACKINGLIST
                 }
                 else
                 {
-                    IRfcTable HEADER = rfcFMname.GetTable("HEADER");
-                    IRfcTable ITEM = rfcFMname.GetTable("ITEM");
-                    IRfcTable TLINE1 = rfcFMname.GetTable("TLINE1");
-                    IRfcTable TLINE2 = rfcFMname.GetTable("TLINE2");
-                    IRfcTable TLINE3 = rfcFMname.GetTable("TLINE3");
+                    IRfcTable HEADER = rfcGetPackingFM.GetTable("HEADER");
+                    IRfcTable ITEM = rfcGetPackingFM.GetTable("ITEM");
+                    IRfcTable TLINE1 = rfcGetPackingFM.GetTable("TLINE1");
+                    IRfcTable TLINE2 = rfcGetPackingFM.GetTable("TLINE2");
+                    IRfcTable TLINE3 = rfcGetPackingFM.GetTable("TLINE3");
 
                     //当前内表的索引行
                     HEADER.CurrentIndex = 0;
@@ -426,6 +434,7 @@ namespace PACKINGLIST
             app.Visible = false;  // excel 程式是否顯示
 
             generatePackingSheet(workbook);
+            generateLabelSheet(workbook);
 
             if (File.Exists(fullPathToExcel))
             {
@@ -448,6 +457,240 @@ namespace PACKINGLIST
             tsLabel.Text = "轉檔已完成！放在 " + fullPathToExcel;
 
             //MessageBox.Show("轉檔完畢!", "資訊");
+        }
+
+        private void generateLabelSheet(_Workbook workbook)
+        {
+            string strSQL = "Select * from LABEL where [KEY] = @key order by _NullFlags"; //LABEL VIEW
+            SqlConnection conn = new SqlConnection(strConn);
+            SqlCommand cmd = new SqlCommand(strSQL, conn);
+            cmd.CommandType = CommandType.Text;
+            conn.Open();
+
+            SqlParameter key = new SqlParameter("@key", SqlDbType.Char, 14);
+            key.Value = txtKey.Text;
+            key.Direction = ParameterDirection.Input;
+            cmd.Parameters.Add(key);
+
+            SqlDataReader sqlReader = cmd.ExecuteReader();
+
+            System.Data.DataTable dt = new System.Data.DataTable();
+            dt.Load(sqlReader, LoadOption.OverwriteChanges);
+            cmd.Dispose();
+            conn.Close();
+            conn.Dispose();
+
+            dt.Columns.Add("OTH_REF");
+            dt.Columns.Add("OLD_ITEM");
+            dt.Columns.Add("BOXCODE");
+            dt.Columns.Add("MOGNBR1");
+            dt.Columns.Add("ENGDES");
+            dt.Columns.Add("SPNDES");
+            dt.Columns.Add("GERDES");
+            dt.Columns.Add("LBLCODE");
+            dt.Columns.Add("LBLTYPE");
+            dt.Columns.Add("LBLSTYE");
+            dt.Columns.Add("OENBR1");
+            dt.Columns.Add("OENBR2");
+            dt.Columns.Add("OENBR3");
+            dt.Columns.Add("OENBR4");
+            dt.Columns.Add("OENBR5");
+            dt.Columns.Add("OENBR6");
+            dt.Columns.Add("OENBR7");
+            dt.Columns.Add("OENBR8");
+            dt.Columns.Add("OENBR9");
+            dt.Columns.Add("OENBR10");
+            dt.Columns.Add("MOGNBR2");
+            dt.Columns.Add("TPFNBR1");
+            dt.Columns.Add("TPFNBR2");
+            dt.Columns.Add("TRWNBR1");
+            dt.Columns.Add("TRWNBR2");
+            dt.Columns.Add("DANNBR1");
+            dt.Columns.Add("DANNBR2");
+            dt.Columns.Add("MCQNBR1");
+            dt.Columns.Add("MCQNBR2");
+            dt.Columns.Add("DESC1");
+            dt.Columns.Add("DESC2");
+            dt.Columns.Add("DESC3");
+            dt.Columns.Add("DESC4");
+            dt.Columns.Add("DESC5");
+            dt.Columns.Add("DESC6");
+            dt.Columns.Add("DESC7");
+            dt.Columns.Add("DESC8");
+            dt.Columns.Add("DESC9");
+            dt.Columns.Add("DESC10");
+            dt.Columns.Add("QRCODE");
+            dt.Columns.Add("HBSQRCODE");
+
+            for (int i = 0; i <= dt.Rows.Count - 1; i++)
+            {
+                RfcConfigParameters rfcPar = new RfcConfigParameters();
+                rfcPar.Add(RfcConfigParameters.Name, D_connSID);
+                rfcPar.Add(RfcConfigParameters.AppServerHost, D_connIP);
+                rfcPar.Add(RfcConfigParameters.Client, D_connClient);
+                rfcPar.Add(RfcConfigParameters.User, D_connUser);
+                rfcPar.Add(RfcConfigParameters.Password, D_connPwd);
+                rfcPar.Add(RfcConfigParameters.SystemNumber, "00");
+                rfcPar.Add(RfcConfigParameters.Language, D_connLanguage);
+                RfcDestination dest = RfcDestinationManager.GetDestination(rfcPar);
+                RfcRepository rfcrep = dest.Repository;
+                IRfcFunction myfun = null;
+
+                myfun = rfcrep.CreateFunction(getLabelData);
+
+                myfun.SetValue("P_VBELN", dt.Rows[i]["NBR"]);   //訂單號碼
+                myfun.SetValue("P_POSNR", dt.Rows[i]["POSNR"].ToString());  //訂單項次
+
+                myfun.Invoke(dest);
+
+                IRfcTable ITAB = myfun.GetTable("ITAB");
+                if (ITAB.CurrentIndex == 0)
+                {
+                    //只取第一列
+                    ITAB.CurrentIndex = 0;
+                    dt.Rows[i]["OTH_REF"] = ITAB.GetString("KDMAT");
+                    dt.Rows[i]["OLD_ITEM"] = ITAB.GetString("BISMT");
+                    dt.Rows[i]["OENBR1"] = ITAB.GetString("OENBR1");
+                    dt.Rows[i]["OENBR2"] = ITAB.GetString("OENBR2");
+                    dt.Rows[i]["OENBR3"] = ITAB.GetString("OENBR3");
+                    dt.Rows[i]["OENBR4"] = ITAB.GetString("OENBR4");
+                    dt.Rows[i]["OENBR5"] = ITAB.GetString("OENBR5");
+                    dt.Rows[i]["OENBR6"] = ITAB.GetString("OENBR6");
+                    dt.Rows[i]["OENBR7"] = ITAB.GetString("OENBR7");
+                    dt.Rows[i]["OENBR8"] = ITAB.GetString("OENBR8");
+                    dt.Rows[i]["OENBR9"] = ITAB.GetString("OENBR9");
+                    dt.Rows[i]["OENBR10"] = ITAB.GetString("OENBR10");
+                    dt.Rows[i]["MOGNBR1"] = ITAB.GetString("MOGNBR1");
+                    dt.Rows[i]["MOGNBR2"] = ITAB.GetString("MOGNBR2");
+                    dt.Rows[i]["TPFNBR1"] = ITAB.GetString("TPFNBR1");
+                    dt.Rows[i]["TPFNBR2"] = ITAB.GetString("TPFNBR2");
+                    dt.Rows[i]["TRWNBR1"] = ITAB.GetString("TRWNBR1");
+                    dt.Rows[i]["TRWNBR2"] = ITAB.GetString("TRWNBR2");
+                    dt.Rows[i]["DANNBR1"] = ITAB.GetString("DANNBR1");
+                    dt.Rows[i]["DANNBR2"] = ITAB.GetString("DANNBR2");
+                    dt.Rows[i]["MCQNBR1"] = ITAB.GetString("MCQNBR1");
+                    dt.Rows[i]["MCQNBR2"] = ITAB.GetString("MCQNBR2");
+                    dt.Rows[i]["ENGDES"] = ITAB.GetString("ENGDES");
+                    dt.Rows[i]["SPNDES"] = ITAB.GetString("SPNDES");
+                    dt.Rows[i]["GERDES"] = ITAB.GetString("GERDES");
+                    dt.Rows[i]["DESC1"] = ITAB.GetString("DESC1");
+                    dt.Rows[i]["DESC2"] = ITAB.GetString("DESC2");
+                    dt.Rows[i]["DESC3"] = ITAB.GetString("DESC3");
+                    dt.Rows[i]["DESC4"] = ITAB.GetString("DESC4");
+                    dt.Rows[i]["DESC5"] = ITAB.GetString("DESC5");
+                    dt.Rows[i]["DESC6"] = ITAB.GetString("DESC6");
+                    dt.Rows[i]["DESC7"] = ITAB.GetString("DESC7");
+                    dt.Rows[i]["DESC8"] = ITAB.GetString("DESC8");
+                    dt.Rows[i]["DESC9"] = ITAB.GetString("DESC9");
+                    dt.Rows[i]["DESC10"] = ITAB.GetString("DESC10");
+                    dt.Rows[i]["BOXCODE"] = ITAB.GetString("BOXCODE");
+                    dt.Rows[i]["LBLCODE"] = ITAB.GetString("LBLCODE");
+                    dt.Rows[i]["LBLTYPE"] = ITAB.GetString("LBLTYPE");
+                    dt.Rows[i]["LBLSTYE"] = ITAB.GetString("LBLSTYE");
+
+                    if ((ITAB.GetString("QRCODE") == null) || (ITAB.GetString("QRCODE") == "") || (ITAB.GetString("QRCODE") == " "))
+                    {
+                        dt.Rows[i]["QRCODE"] = "";
+                        dt.Rows[i]["HBSQRCODE"] = "";
+                    }
+                    else
+                    {
+                        dt.Rows[i]["QRCODE"] = ITAB.GetString("QRCODE");
+                        dt.Rows[i]["HBSQRCODE"] = dt.Rows[i]["QRCODE"].ToString() + dt.Rows[i]["CUS_ITEM"].ToString();
+                    }
+
+                }
+
+
+            }
+            BindingSource bs = new BindingSource();
+            dtCount = dt.Rows.Count + 1;
+            bs.DataSource = dt.DefaultView;
+            dataGridView1.DefaultCellStyle.Padding = new Padding(0, 0, 0, 0);
+            dataGridView1.DataSource = bs;
+
+            foreach (DataGridViewColumn column in dataGridView1.Columns)
+            {
+                //表頭選擇
+                column.HeaderCell = new
+                DataGridViewAutoFilterColumnHeaderCell(column.HeaderCell);
+
+                //禁止排序
+                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+            }
+
+
+            //欄位數值格式, 設定到資料最後一筆，避免大容量的excel檔
+            app.Application.get_Range("A1", "BZ" + dtCount.ToString()).NumberFormat = "@";
+
+            Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
+            Microsoft.Office.Interop.Excel._Worksheet calcSheet = null;
+
+            app.Visible = true;  // excel 程式是否顯示
+
+            worksheet = workbook.Sheets["工作表2"];
+            worksheet.Name = "標籤明細";
+
+            //計算 dataGrid 的欄列數
+            string maxCols = GetStandardExcelColumnName(dataGridView1.Columns.Count);
+            string maxRows = dataGridView1.Rows.Count.ToString();
+
+            //將 datagrid 填入 excel 中
+            //填上標題列
+            for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
+            {
+                worksheet.Cells[1, i] = dataGridView1.Columns[i - 1].HeaderText;
+            }
+
+            //宣告 datagrid 沒有標題列
+            dataGridView1.RowHeadersVisible = false;
+
+            //將資料從 datagrid 貼到 object 
+            dataGridView1.SelectAll();
+            DataObject dataObj = dataGridView1.GetClipboardContent();
+            if (dataObj != null) Clipboard.SetDataObject(dataObj);
+
+            //將 object 傳給 workbook
+            worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets.get_Item(1);
+
+            //將資料貼入第二列 (第一列是標題列)
+            Microsoft.Office.Interop.Excel.Range workRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[2, 1];
+
+            workRange.Select();
+
+            //從剪貼薄貼上
+            worksheet.PasteSpecial(workRange, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
+
+            //將 worksheet 複製一份到 calcsheet
+            worksheet.Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
+
+            // 複製的 excel 更名
+            workbook.Sheets[workbook.Sheets.Count].Name = "計算張數";
+
+            //選取 calcSheet
+            calcSheet = workbook.Sheets[workbook.Sheets.Count];
+
+            //刪掉不要的部份
+            calcSheet.Range["A1:I" + maxRows].Delete();
+            calcSheet.Range["B1:" + maxCols + maxRows].Delete();
+
+            //去除重覆料號
+            calcSheet.Range["A1:A" + maxRows].RemoveDuplicates(1);
+            calcSheet.UsedRange.NumberFormat = "General";
+            calcSheet.Range["A1"].Value = "料號";
+            calcSheet.Range["B1"].Value = "張數";
+
+            //求有值的最大列數
+            int calcsheetMaxRows = calcSheet.Range["A1"].Offset[calcSheet.Rows.Count - 1, 0].End[Microsoft.Office.Interop.Excel.XlDirection.xlUp].Row;
+
+            calcSheet.Range["B2"].Value = "=COUNTIF(標籤明細!J:J,A2)";
+
+            //將公式往下複製
+            calcSheet.Range["B2"].Copy(calcSheet.Range["B3:B" + calcsheetMaxRows]);
+
+            //刪掉多的工作表
+            workbook.Sheets["工作表2"].Delete();
+
         }
 
         private void generatePackingSheet(_Workbook workbook)

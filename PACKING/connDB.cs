@@ -1,4 +1,6 @@
 ﻿using SAP.Middleware.Connector;
+using System.Data.SqlClient;
+using System.Windows.Forms;
 
 namespace connDB
 {
@@ -64,4 +66,35 @@ namespace connDB
         }
 
     }
+
+    class chkFormStatusClass
+    {
+        private bool formStatus;
+
+        public bool isFormActive(string formName)
+        {
+            string connString = "Data Source=192.168.0.9;Initial Catalog=rptsvrDB ;User ID=rptsvrDB ;Password=adminrp";
+            string queryString = "select activeStatus from activeForm where formName=@formName";
+
+            SqlConnection scToSbsdb = new SqlConnection(connString);
+            SqlCommand cmdToSbsdb = new SqlCommand(queryString, scToSbsdb);
+            cmdToSbsdb.Parameters.Add("@formName", System.Data.SqlDbType.VarChar).Value = formName;
+
+            try
+            {
+                scToSbsdb.Open();
+
+                SqlDataReader sdr = cmdToSbsdb.ExecuteReader();
+                formStatus = System.Convert.ToBoolean(sdr.Read());
+
+                scToSbsdb.Close();
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "error");
+            }
+            return formStatus;
+        }
+    }
+
 }
