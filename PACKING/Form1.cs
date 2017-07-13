@@ -23,7 +23,7 @@ namespace PACKINGLIST
         string rfcFuncName = "ZSDRFC002";
 
         //開發資訊
-        bool isTesting = false;
+        bool isTesting = true;
 
         string winFormVersion = "1.12";
 
@@ -421,7 +421,7 @@ namespace PACKINGLIST
             string fullPathToExcel = desktopFolderPath + "\\" + excelFileName;
 
             //設定工作表數量
-            app.SheetsInNewWorkbook = 3;
+            app.SheetsInNewWorkbook = 4;
 
             app.Visible = false;  // excel 程式是否顯示
 
@@ -452,6 +452,7 @@ namespace PACKINGLIST
 
         private void generatePackingSheet(_Workbook workbook)
         {
+            
             Microsoft.Office.Interop.Excel._Worksheet packingSheet = null;
             packingSheet = workbook.Sheets["工作表1"];
             packingSheet = workbook.ActiveSheet;
