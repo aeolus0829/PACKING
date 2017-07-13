@@ -24,16 +24,17 @@ namespace PACKINGLIST
         sapReportPrms sapReportPrms = new sapReportPrms();
 
         //連線資訊
-        string packingDB = "PRD";
-        string sapDB = "800";
         string rfcFuncName = "ZSDRFC002";
 
         //開發資訊
-        bool TESTING = false;
+        bool isTesting = false;
+
         string winFormVersion = "1.12";
 
         public Form1()
         {
+            setConnEev(isTesting);
+
             var mssqlConn = new mssqlConnClass();            
 
             dbConnStr  = mssqlConn.toSBSDB(packingDB);
@@ -50,16 +51,35 @@ namespace PACKINGLIST
                 InitializeComponent();
             }
         }
+
+        private void setConnEev(bool isTesting)
+        {
+            switch(isTesting)
+            {
+                case true:
+                    packingDB = "DEV";
+                    sapDB = "620";
+                    break;
+                case false:
+                    packingDB = "PRD";
+                    sapDB = "800";
+                    break;
+            }
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             dt.Clear();
             lbSalesText.Items.Clear();
-            if (TESTING) this.Text += winFormVersion + " 測試版 " + "/ MSSQL: " + packingDB + " / SAP資料環境: " + sapDB;
+            if (isTesting) this.Text += winFormVersion + " 測試版 " + "/ MSSQL: " + packingDB + " / SAP資料環境: " + sapDB;
             else this.Text += winFormVersion;
 
         }
 
         DataTable dt = new DataTable();
+
+        public string packingDB { get; private set; }
+        public string sapDB { get; private set; }
 
         private void BtnSubmit_Click(object sender, EventArgs e)
         {
@@ -77,7 +97,6 @@ namespace PACKINGLIST
             var rfcDest = RfcDestinationManager.GetDestination(rfcPara);
             var rfcRepo = rfcDest.Repository;
             var rfcFMname = rfcRepo.CreateFunction(rfcFuncName);
-
 
             //結束箱號暫存
             int tmpCoNumEnd = 0;
@@ -362,12 +381,12 @@ namespace PACKINGLIST
             lbSalesText.Items.Add("加總才數：" + sumTotVolume.ToString("0.000"));
         }
 
-        private void addTLINEtoListbox(IRfcTable TLINE)
+        private void addTLINEtoListbox(IRfcTable TLINE) //添加銷售內文到 excel 底下
         {
             for (int tCount = 0; tCount < TLINE.RowCount; tCount++)
             {
                 TLINE.CurrentIndex = tCount;
-                string fixedTline = proceTline(TLINE.GetString("TDLINE"));
+                string fixedTline = removeFormatString(TLINE.GetString("TDLINE"));
 
 
                 lbSalesText.Items.Add(fixedTline);
@@ -375,7 +394,7 @@ namespace PACKINGLIST
             }
         }
 
-        private string proceTline(string inputText)
+        private string removeFormatString(string inputText)
         {
             string regPattern, fixedText, replaceWith;
 
@@ -403,6 +422,9 @@ namespace PACKINGLIST
             Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
             Microsoft.Office.Interop.Excel._Worksheet packingSheet = null;
+
+            //設定工作表數量
+            app.SheetsInNewWorkbook = 3;
 
             app.Visible = false;  // excel 程式是否顯示
 
