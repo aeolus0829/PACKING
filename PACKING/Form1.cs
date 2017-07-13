@@ -32,23 +32,15 @@ namespace PACKINGLIST
         {
             setConnEev(isTesting);
 
-            var mssqlConn = new mssqlConnClass();            
-            
-            
+            var mssqlConn = new mssqlConnClass();
+
+            chkFormStatusClass chkForm = new chkFormStatusClass();
+            var isFormActive = chkForm.isFormActive(formName);
 
             dbConnStr  = mssqlConn.toSBSDB(packingDB);
 
-            string[] ALL = sapReportPrms.SQL();
-            D_status = ALL[4];
-
-            if (D_status == "false")
-            {
-                MessageBox.Show("目前程式停用中，請連絡資訊組");
-            }
-            else
-            {
-                InitializeComponent();
-            }
+            if (isFormActive) InitializeComponent();
+            else MessageBox.Show("目前程式停用中，可能是特定時間或缺乏使用權限，請連絡資訊組");
         }
 
         private void setConnEev(bool isTesting)
