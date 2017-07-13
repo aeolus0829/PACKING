@@ -1,18 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using connDB;
 using System.Windows.Forms;
 
 using SAP.Middleware.Connector;
-using System.Collections;
 using System.Text.RegularExpressions;
+using Microsoft.Office.Interop.Excel;
 
 namespace PACKINGLIST
 {
@@ -76,7 +72,7 @@ namespace PACKINGLIST
 
         }
 
-        DataTable dt = new DataTable();
+        System.Data.DataTable dt = new System.Data.DataTable();
 
         public string packingDB { get; private set; }
         public string sapDB { get; private set; }
@@ -421,22 +417,49 @@ namespace PACKINGLIST
             string desktopFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
-            Microsoft.Office.Interop.Excel._Worksheet packingSheet = null;
+            string excelFileName = "訂單包裝明細.xlsx";
+            string fullPathToExcel = desktopFolderPath + "\\" + excelFileName;
 
             //設定工作表數量
             app.SheetsInNewWorkbook = 3;
 
             app.Visible = false;  // excel 程式是否顯示
 
+            generatePackingSheet(workbook);
+
+            if (File.Exists(fullPathToExcel))
+            {
+                try
+                {
+                    File.Delete(fullPathToExcel);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("檔案已存在，無法覆蓋，原檔案有開著嗎？", "錯誤");
+                }
+
+            }
+
+            workbook.SaveAs(fullPathToExcel, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
+                Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+            app.Quit();
+            Cursor.Current = Cursors.Default;
+
+            tsLabel.Text = "轉檔已完成！放在 " + fullPathToExcel;
+
+            //MessageBox.Show("轉檔完畢!", "資訊");
+        }
+
+        private void generatePackingSheet(_Workbook workbook)
+        {
+            Microsoft.Office.Interop.Excel._Worksheet packingSheet = null;
             packingSheet = workbook.Sheets["工作表1"];
             packingSheet = workbook.ActiveSheet;
             packingSheet.Name = "訂單包裝明細";
-            string excelFileName = packingSheet.Name + ".xlsx";
-            string fullPathToExcel = desktopFolderPath + "\\" + excelFileName;
 
             int packingKeyRow = 1;
             int orderNumRow = 2;
-            int cusNumRow= 3;
+            int cusNumRow = 3;
             int cusNameRow = 4;
             int estDeliveryDateRow = 5;
 
@@ -462,9 +485,9 @@ namespace PACKINGLIST
             int itemDetailRowStart = itemHeaderRowStart + 1;
             int textRowStart = itemDetailRowStart + dataGridView1.Rows.Count + 1;
 
-          
+
             //表頭
-            for (int i = 0; i <= lastVisbleColumnCount ; i++) 
+            for (int i = 0; i <= lastVisbleColumnCount; i++)
             {
                 columnNum = i + 1;
                 packingSheet.Cells[itemHeaderRowStart, columnNum] = dataGridView1.Columns[i].HeaderText;
@@ -491,49 +514,26 @@ namespace PACKINGLIST
             packingSheet.PasteSpecial(itemRangeStart, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
 
             //清除不需要資料的欄位
-            packingSheet.Range["S" + itemBodyRowStart + ":AL" + dataGridView1.Rows.Count+ itemBodyRowStart].Clear();
-           
+            packingSheet.Range["S" + itemBodyRowStart + ":AL" + dataGridView1.Rows.Count + itemBodyRowStart].Clear();
+
             int borderRange = dataGridView1.Rows.Count + itemHeaderRowStart;
 
             for (int i = itemHeaderRowStart; i < borderRange; i++)
             {
                 //標註列，加上底線
                 packingSheet.Range["A" + i + ":R" + i].Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
-            }          
+            }
 
             //內文
-            for (int s = 0; s < lbSalesText.Items.Count ; s++)  
+            for (int s = 0; s < lbSalesText.Items.Count; s++)
             {
                 packingSheet.Cells[s + textRowStart, 1] = lbSalesText.Items[s].ToString();
             }
-            if (File.Exists(fullPathToExcel))
-            {
-                try
-                {
-                    File.Delete(fullPathToExcel);
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("檔案已存在，無法覆蓋，原檔案有開著嗎？","錯誤");
-                }
-                
-            }
-
             packingSheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬
             ((Microsoft.Office.Interop.Excel.Range)packingSheet.Columns["A:B", System.Type.Missing]).ColumnWidth = 8;
 
-
-            workbook.SaveAs(fullPathToExcel, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
-                Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-            app.Quit();
-            Cursor.Current = Cursors.Default;
-
-            tsLabel.Text = "轉檔已完成！放在 " + fullPathToExcel;
-
-            //MessageBox.Show("轉檔完畢!", "資訊");
         }
 
-       
         private void btnTodb_Click(object sender, EventArgs e)
         {
             //檢查GRIDVIEW
@@ -564,7 +564,7 @@ namespace PACKINGLIST
                 */
             }
         }
-        private void bulkWriteToPacking(DataTable dataTable)
+        private void bulkWriteToPacking(System.Data.DataTable dataTable)
         {
             SqlConnection bulkConn = new SqlConnection(dbConnStr);
             SqlBulkCopy SBC = new SqlBulkCopy(bulkConn);
@@ -622,7 +622,7 @@ namespace PACKINGLIST
             }
             
         }
-        private void bulkWriteToCustoms(DataTable dataTable)
+        private void bulkWriteToCustoms(System.Data.DataTable dataTable)
         {
             SqlConnection bulkConn = new SqlConnection(dbConnStr);
             SqlBulkCopy SBC = new SqlBulkCopy(bulkConn);
