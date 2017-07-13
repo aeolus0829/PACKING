@@ -24,12 +24,12 @@ namespace PACKINGLIST
         sapReportPrms sapReportPrms = new sapReportPrms();
 
         //連線資訊
-        string packingDB = "DEV";
-        string sapDB = "620";
+        string packingDB = "PRD";
+        string sapDB = "800";
         string rfcFuncName = "ZSDRFC002";
 
         //開發資訊
-        bool TESTING = true;
+        bool TESTING = false;
         string winFormVersion = "1.12";
 
         public Form1()
@@ -402,14 +402,14 @@ namespace PACKINGLIST
             string desktopFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
             Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
-            Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
+            Microsoft.Office.Interop.Excel._Worksheet packingSheet = null;
 
             app.Visible = false;  // excel 程式是否顯示
 
-            worksheet = workbook.Sheets["工作表1"];
-            worksheet = workbook.ActiveSheet;
-            worksheet.Name = "訂單包裝明細";
-            string excelFileName = worksheet.Name + ".xlsx";
+            packingSheet = workbook.Sheets["工作表1"];
+            packingSheet = workbook.ActiveSheet;
+            packingSheet.Name = "訂單包裝明細";
+            string excelFileName = packingSheet.Name + ".xlsx";
             string fullPathToExcel = desktopFolderPath + "\\" + excelFileName;
 
             int packingKeyRow = 1;
@@ -425,17 +425,17 @@ namespace PACKINGLIST
             int columnNum;
 
             // 將包裝單號，放置於工作表左上角，[第一列，第一行]
-            worksheet.Cells[packingKeyRow, firstColumnNum] = "包裝單號： " + packingKey;
-            worksheet.Cells[orderNumRow, firstColumnNum] = lblOrderNum.Text;
-            worksheet.Cells[cusNumRow, firstColumnNum] = lblCusNum.Text;
-            worksheet.Cells[cusNameRow, firstColumnNum] = lblCusName.Text;
-            worksheet.Cells[estDeliveryDateRow, firstColumnNum] = lblEstDeliveryDate.Text;
+            packingSheet.Cells[packingKeyRow, firstColumnNum] = "包裝單號： " + packingKey;
+            packingSheet.Cells[orderNumRow, firstColumnNum] = lblOrderNum.Text;
+            packingSheet.Cells[cusNumRow, firstColumnNum] = lblCusNum.Text;
+            packingSheet.Cells[cusNameRow, firstColumnNum] = lblCusName.Text;
+            packingSheet.Cells[estDeliveryDateRow, firstColumnNum] = lblEstDeliveryDate.Text;
 
             // 計算項目資料筆數，lastVisbleColumnCount 是允許出貨組看到的最大欄位數
             itemCount = itemCount + lastVisbleColumnCount + dataGridView1.Rows.Count;
 
             //  excel 資料全部轉為文字 
-            worksheet.Columns.EntireColumn.NumberFormat = "@";
+            packingSheet.Columns.EntireColumn.NumberFormat = "@";
 
             int itemDetailRowStart = itemHeaderRowStart + 1;
             int textRowStart = itemDetailRowStart + dataGridView1.Rows.Count + 1;
@@ -445,7 +445,7 @@ namespace PACKINGLIST
             for (int i = 0; i <= lastVisbleColumnCount ; i++) 
             {
                 columnNum = i + 1;
-                worksheet.Cells[itemHeaderRowStart, columnNum] = dataGridView1.Columns[i].HeaderText;
+                packingSheet.Cells[itemHeaderRowStart, columnNum] = dataGridView1.Columns[i].HeaderText;
             }
 
             //項目
@@ -459,30 +459,30 @@ namespace PACKINGLIST
             if (dobj != null) Clipboard.SetDataObject(dobj);
 
             //將 object 傳給 workbook
-            worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets.get_Item(1);
+            packingSheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets.get_Item(1);
 
             //將資料貼入第七列 (前面是表頭資訊)
-            Microsoft.Office.Interop.Excel.Range itemRangeStart = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[itemBodyRowStart, firstColumnNum];
+            Microsoft.Office.Interop.Excel.Range itemRangeStart = (Microsoft.Office.Interop.Excel.Range)packingSheet.Cells[itemBodyRowStart, firstColumnNum];
             itemRangeStart.Select();
 
             //從剪貼薄貼上
-            worksheet.PasteSpecial(itemRangeStart, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
+            packingSheet.PasteSpecial(itemRangeStart, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
 
             //清除不需要資料的欄位
-            worksheet.Range["S" + itemBodyRowStart + ":AL" + dataGridView1.Rows.Count+ itemBodyRowStart].Clear();
+            packingSheet.Range["S" + itemBodyRowStart + ":AL" + dataGridView1.Rows.Count+ itemBodyRowStart].Clear();
            
             int borderRange = dataGridView1.Rows.Count + itemHeaderRowStart;
 
             for (int i = itemHeaderRowStart; i < borderRange; i++)
             {
                 //標註列，加上底線
-                worksheet.Range["A" + i + ":R" + i].Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
+                packingSheet.Range["A" + i + ":R" + i].Borders[Microsoft.Office.Interop.Excel.XlBordersIndex.xlEdgeBottom].LineStyle = Microsoft.Office.Interop.Excel.XlLineStyle.xlContinuous;
             }          
 
             //內文
             for (int s = 0; s < lbSalesText.Items.Count ; s++)  
             {
-                worksheet.Cells[s + textRowStart, 1] = lbSalesText.Items[s].ToString();
+                packingSheet.Cells[s + textRowStart, 1] = lbSalesText.Items[s].ToString();
             }
             if (File.Exists(fullPathToExcel))
             {
@@ -497,8 +497,8 @@ namespace PACKINGLIST
                 
             }
 
-            worksheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬
-            ((Microsoft.Office.Interop.Excel.Range)worksheet.Columns["A:B", System.Type.Missing]).ColumnWidth = 8;
+            packingSheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬
+            ((Microsoft.Office.Interop.Excel.Range)packingSheet.Columns["A:B", System.Type.Missing]).ColumnWidth = 8;
 
 
             workbook.SaveAs(fullPathToExcel, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
