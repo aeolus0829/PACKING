@@ -446,8 +446,6 @@ namespace PACKINGLIST
             Cursor.Current = Cursors.Default;
 
             tsLabel.Text = "轉檔已完成！放在 " + fullPathToExcel;
-
-            //MessageBox.Show("轉檔完畢!", "資訊");
         }
 
         private void generateLabelSheet(_Workbook workbook)
@@ -784,13 +782,6 @@ namespace PACKINGLIST
 
                 Clipboard.SetText(packingKey);
 
-                /*
-                DialogResult dr = MessageBox.Show("資料已寫入資料庫" + Environment.NewLine + "鍵值為：" + packingKey, "資訊");
-                if (dr == DialogResult.OK)
-                {
-                    btnClear.PerformClick();
-                }
-                */
             }
         }
         private void bulkWriteToPacking(System.Data.DataTable dataTable)
