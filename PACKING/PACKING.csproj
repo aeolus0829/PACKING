@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="connDB.cs" />
+    <Compile Include="DataGridViewAutoFilterColumnHeaderCell.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -9,15 +9,14 @@ using System.Windows.Forms;
 using SAP.Middleware.Connector;
 using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Excel;
+using DataGridViewAutoFilter;
 
 namespace PACKINGLIST
 {
     public partial class Form1 : Form
     {
-        string D_status;
         string userName, packingKey, dbConnStr;        
         int itemCount = 0;
-        sapReportPrms sapReportPrms = new sapReportPrms();
 
         //連線資訊
         string getPackingData = "ZSDRFC002";
@@ -70,6 +69,10 @@ namespace PACKINGLIST
             rfcDest = RfcDestinationManager.GetDestination(rfcPara);
             rfcRepo = rfcDest.Repository;
 
+            userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            packingKey = DateTime.Now.ToString("yyyyMMdd").Trim() + DateTime.Now.ToString("HHmmss").Trim();
+
+
         }
 
         System.Data.DataTable dt = new System.Data.DataTable();
@@ -85,10 +88,6 @@ namespace PACKINGLIST
         {
             dt.Clear();
             lbSalesText.Items.Clear();
-            //使用者
-            userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            //KEY
-            packingKey = DateTime.Now.ToString("yyyyMMdd").Trim() + DateTime.Now.ToString("HHmmss").Trim();
 
             Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
 
@@ -453,172 +452,150 @@ namespace PACKINGLIST
 
         private void generateLabelSheet(_Workbook workbook)
         {
-            string strSQL = "Select * from LABEL where [KEY] = @key order by _NullFlags"; //LABEL VIEW
-            SqlConnection conn = new SqlConnection(strConn);
+            string strSQL = "Select * from LABEL where [KEY] = @key order by _NullFlags"; 
+            SqlConnection conn = new SqlConnection(dbConnStr);
             SqlCommand cmd = new SqlCommand(strSQL, conn);
             cmd.CommandType = CommandType.Text;
             conn.Open();
 
-            SqlParameter key = new SqlParameter("@key", SqlDbType.Char, 14);
-            key.Value = txtKey.Text;
-            key.Direction = ParameterDirection.Input;
-            cmd.Parameters.Add(key);
+            SqlParameter paraKey = new SqlParameter("@key", SqlDbType.Char, 14);
+            paraKey.Value = packingKey;
+            paraKey.Direction = ParameterDirection.Input;
+            cmd.Parameters.Add(paraKey);
 
             SqlDataReader sqlReader = cmd.ExecuteReader();
 
-            System.Data.DataTable dt = new System.Data.DataTable();
-            dt.Load(sqlReader, LoadOption.OverwriteChanges);
+            System.Data.DataTable labelDt = new System.Data.DataTable();
+            labelDt.Load(sqlReader, LoadOption.OverwriteChanges);
             cmd.Dispose();
             conn.Close();
             conn.Dispose();
 
-            dt.Columns.Add("OTH_REF");
-            dt.Columns.Add("OLD_ITEM");
-            dt.Columns.Add("BOXCODE");
-            dt.Columns.Add("MOGNBR1");
-            dt.Columns.Add("ENGDES");
-            dt.Columns.Add("SPNDES");
-            dt.Columns.Add("GERDES");
-            dt.Columns.Add("LBLCODE");
-            dt.Columns.Add("LBLTYPE");
-            dt.Columns.Add("LBLSTYE");
-            dt.Columns.Add("OENBR1");
-            dt.Columns.Add("OENBR2");
-            dt.Columns.Add("OENBR3");
-            dt.Columns.Add("OENBR4");
-            dt.Columns.Add("OENBR5");
-            dt.Columns.Add("OENBR6");
-            dt.Columns.Add("OENBR7");
-            dt.Columns.Add("OENBR8");
-            dt.Columns.Add("OENBR9");
-            dt.Columns.Add("OENBR10");
-            dt.Columns.Add("MOGNBR2");
-            dt.Columns.Add("TPFNBR1");
-            dt.Columns.Add("TPFNBR2");
-            dt.Columns.Add("TRWNBR1");
-            dt.Columns.Add("TRWNBR2");
-            dt.Columns.Add("DANNBR1");
-            dt.Columns.Add("DANNBR2");
-            dt.Columns.Add("MCQNBR1");
-            dt.Columns.Add("MCQNBR2");
-            dt.Columns.Add("DESC1");
-            dt.Columns.Add("DESC2");
-            dt.Columns.Add("DESC3");
-            dt.Columns.Add("DESC4");
-            dt.Columns.Add("DESC5");
-            dt.Columns.Add("DESC6");
-            dt.Columns.Add("DESC7");
-            dt.Columns.Add("DESC8");
-            dt.Columns.Add("DESC9");
-            dt.Columns.Add("DESC10");
-            dt.Columns.Add("QRCODE");
-            dt.Columns.Add("HBSQRCODE");
+            labelDt.Columns.Add("OTH_REF");
+            labelDt.Columns.Add("OLD_ITEM");
+            labelDt.Columns.Add("BOXCODE");
+            labelDt.Columns.Add("MOGNBR1");
+            labelDt.Columns.Add("ENGDES");
+            labelDt.Columns.Add("SPNDES");
+            labelDt.Columns.Add("GERDES");
+            labelDt.Columns.Add("LBLCODE");
+            labelDt.Columns.Add("LBLTYPE");
+            labelDt.Columns.Add("LBLSTYE");
+            labelDt.Columns.Add("OENBR1");
+            labelDt.Columns.Add("OENBR2");
+            labelDt.Columns.Add("OENBR3");
+            labelDt.Columns.Add("OENBR4");
+            labelDt.Columns.Add("OENBR5");
+            labelDt.Columns.Add("OENBR6");
+            labelDt.Columns.Add("OENBR7");
+            labelDt.Columns.Add("OENBR8");
+            labelDt.Columns.Add("OENBR9");
+            labelDt.Columns.Add("OENBR10");
+            labelDt.Columns.Add("MOGNBR2");
+            labelDt.Columns.Add("TPFNBR1");
+            labelDt.Columns.Add("TPFNBR2");
+            labelDt.Columns.Add("TRWNBR1");
+            labelDt.Columns.Add("TRWNBR2");
+            labelDt.Columns.Add("DANNBR1");
+            labelDt.Columns.Add("DANNBR2");
+            labelDt.Columns.Add("MCQNBR1");
+            labelDt.Columns.Add("MCQNBR2");
+            labelDt.Columns.Add("DESC1");
+            labelDt.Columns.Add("DESC2");
+            labelDt.Columns.Add("DESC3");
+            labelDt.Columns.Add("DESC4");
+            labelDt.Columns.Add("DESC5");
+            labelDt.Columns.Add("DESC6");
+            labelDt.Columns.Add("DESC7");
+            labelDt.Columns.Add("DESC8");
+            labelDt.Columns.Add("DESC9");
+            labelDt.Columns.Add("DESC10");
+            labelDt.Columns.Add("QRCODE");
+            labelDt.Columns.Add("HBSQRCODE");
 
-            for (int i = 0; i <= dt.Rows.Count - 1; i++)
+            var rfcGetPackingFM = rfcRepo.CreateFunction(getLabelData); 
+
+            for (int i = 0; i <= labelDt.Rows.Count - 1; i++)
             {
-                RfcConfigParameters rfcPar = new RfcConfigParameters();
-                rfcPar.Add(RfcConfigParameters.Name, D_connSID);
-                rfcPar.Add(RfcConfigParameters.AppServerHost, D_connIP);
-                rfcPar.Add(RfcConfigParameters.Client, D_connClient);
-                rfcPar.Add(RfcConfigParameters.User, D_connUser);
-                rfcPar.Add(RfcConfigParameters.Password, D_connPwd);
-                rfcPar.Add(RfcConfigParameters.SystemNumber, "00");
-                rfcPar.Add(RfcConfigParameters.Language, D_connLanguage);
-                RfcDestination dest = RfcDestinationManager.GetDestination(rfcPar);
-                RfcRepository rfcrep = dest.Repository;
-                IRfcFunction myfun = null;
+                rfcGetPackingFM.SetValue("P_VBELN", labelDt.Rows[i]["NBR"]);   //訂單號碼
+                rfcGetPackingFM.SetValue("P_POSNR", labelDt.Rows[i]["POSNR"].ToString());  //訂單項次
 
-                myfun = rfcrep.CreateFunction(getLabelData);
+                rfcGetPackingFM.Invoke(rfcDest);
 
-                myfun.SetValue("P_VBELN", dt.Rows[i]["NBR"]);   //訂單號碼
-                myfun.SetValue("P_POSNR", dt.Rows[i]["POSNR"].ToString());  //訂單項次
-
-                myfun.Invoke(dest);
-
-                IRfcTable ITAB = myfun.GetTable("ITAB");
+                IRfcTable ITAB = rfcGetPackingFM.GetTable("ITAB");
                 if (ITAB.CurrentIndex == 0)
                 {
                     //只取第一列
                     ITAB.CurrentIndex = 0;
-                    dt.Rows[i]["OTH_REF"] = ITAB.GetString("KDMAT");
-                    dt.Rows[i]["OLD_ITEM"] = ITAB.GetString("BISMT");
-                    dt.Rows[i]["OENBR1"] = ITAB.GetString("OENBR1");
-                    dt.Rows[i]["OENBR2"] = ITAB.GetString("OENBR2");
-                    dt.Rows[i]["OENBR3"] = ITAB.GetString("OENBR3");
-                    dt.Rows[i]["OENBR4"] = ITAB.GetString("OENBR4");
-                    dt.Rows[i]["OENBR5"] = ITAB.GetString("OENBR5");
-                    dt.Rows[i]["OENBR6"] = ITAB.GetString("OENBR6");
-                    dt.Rows[i]["OENBR7"] = ITAB.GetString("OENBR7");
-                    dt.Rows[i]["OENBR8"] = ITAB.GetString("OENBR8");
-                    dt.Rows[i]["OENBR9"] = ITAB.GetString("OENBR9");
-                    dt.Rows[i]["OENBR10"] = ITAB.GetString("OENBR10");
-                    dt.Rows[i]["MOGNBR1"] = ITAB.GetString("MOGNBR1");
-                    dt.Rows[i]["MOGNBR2"] = ITAB.GetString("MOGNBR2");
-                    dt.Rows[i]["TPFNBR1"] = ITAB.GetString("TPFNBR1");
-                    dt.Rows[i]["TPFNBR2"] = ITAB.GetString("TPFNBR2");
-                    dt.Rows[i]["TRWNBR1"] = ITAB.GetString("TRWNBR1");
-                    dt.Rows[i]["TRWNBR2"] = ITAB.GetString("TRWNBR2");
-                    dt.Rows[i]["DANNBR1"] = ITAB.GetString("DANNBR1");
-                    dt.Rows[i]["DANNBR2"] = ITAB.GetString("DANNBR2");
-                    dt.Rows[i]["MCQNBR1"] = ITAB.GetString("MCQNBR1");
-                    dt.Rows[i]["MCQNBR2"] = ITAB.GetString("MCQNBR2");
-                    dt.Rows[i]["ENGDES"] = ITAB.GetString("ENGDES");
-                    dt.Rows[i]["SPNDES"] = ITAB.GetString("SPNDES");
-                    dt.Rows[i]["GERDES"] = ITAB.GetString("GERDES");
-                    dt.Rows[i]["DESC1"] = ITAB.GetString("DESC1");
-                    dt.Rows[i]["DESC2"] = ITAB.GetString("DESC2");
-                    dt.Rows[i]["DESC3"] = ITAB.GetString("DESC3");
-                    dt.Rows[i]["DESC4"] = ITAB.GetString("DESC4");
-                    dt.Rows[i]["DESC5"] = ITAB.GetString("DESC5");
-                    dt.Rows[i]["DESC6"] = ITAB.GetString("DESC6");
-                    dt.Rows[i]["DESC7"] = ITAB.GetString("DESC7");
-                    dt.Rows[i]["DESC8"] = ITAB.GetString("DESC8");
-                    dt.Rows[i]["DESC9"] = ITAB.GetString("DESC9");
-                    dt.Rows[i]["DESC10"] = ITAB.GetString("DESC10");
-                    dt.Rows[i]["BOXCODE"] = ITAB.GetString("BOXCODE");
-                    dt.Rows[i]["LBLCODE"] = ITAB.GetString("LBLCODE");
-                    dt.Rows[i]["LBLTYPE"] = ITAB.GetString("LBLTYPE");
-                    dt.Rows[i]["LBLSTYE"] = ITAB.GetString("LBLSTYE");
+                    labelDt.Rows[i]["OTH_REF"] = ITAB.GetString("KDMAT");
+                    labelDt.Rows[i]["OLD_ITEM"] = ITAB.GetString("BISMT");
+                    labelDt.Rows[i]["OENBR1"] = ITAB.GetString("OENBR1");
+                    labelDt.Rows[i]["OENBR2"] = ITAB.GetString("OENBR2");
+                    labelDt.Rows[i]["OENBR3"] = ITAB.GetString("OENBR3");
+                    labelDt.Rows[i]["OENBR4"] = ITAB.GetString("OENBR4");
+                    labelDt.Rows[i]["OENBR5"] = ITAB.GetString("OENBR5");
+                    labelDt.Rows[i]["OENBR6"] = ITAB.GetString("OENBR6");
+                    labelDt.Rows[i]["OENBR7"] = ITAB.GetString("OENBR7");
+                    labelDt.Rows[i]["OENBR8"] = ITAB.GetString("OENBR8");
+                    labelDt.Rows[i]["OENBR9"] = ITAB.GetString("OENBR9");
+                    labelDt.Rows[i]["OENBR10"] = ITAB.GetString("OENBR10");
+                    labelDt.Rows[i]["MOGNBR1"] = ITAB.GetString("MOGNBR1");
+                    labelDt.Rows[i]["MOGNBR2"] = ITAB.GetString("MOGNBR2");
+                    labelDt.Rows[i]["TPFNBR1"] = ITAB.GetString("TPFNBR1");
+                    labelDt.Rows[i]["TPFNBR2"] = ITAB.GetString("TPFNBR2");
+                    labelDt.Rows[i]["TRWNBR1"] = ITAB.GetString("TRWNBR1");
+                    labelDt.Rows[i]["TRWNBR2"] = ITAB.GetString("TRWNBR2");
+                    labelDt.Rows[i]["DANNBR1"] = ITAB.GetString("DANNBR1");
+                    labelDt.Rows[i]["DANNBR2"] = ITAB.GetString("DANNBR2");
+                    labelDt.Rows[i]["MCQNBR1"] = ITAB.GetString("MCQNBR1");
+                    labelDt.Rows[i]["MCQNBR2"] = ITAB.GetString("MCQNBR2");
+                    labelDt.Rows[i]["ENGDES"] = ITAB.GetString("ENGDES");
+                    labelDt.Rows[i]["SPNDES"] = ITAB.GetString("SPNDES");
+                    labelDt.Rows[i]["GERDES"] = ITAB.GetString("GERDES");
+                    labelDt.Rows[i]["DESC1"] = ITAB.GetString("DESC1");
+                    labelDt.Rows[i]["DESC2"] = ITAB.GetString("DESC2");
+                    labelDt.Rows[i]["DESC3"] = ITAB.GetString("DESC3");
+                    labelDt.Rows[i]["DESC4"] = ITAB.GetString("DESC4");
+                    labelDt.Rows[i]["DESC5"] = ITAB.GetString("DESC5");
+                    labelDt.Rows[i]["DESC6"] = ITAB.GetString("DESC6");
+                    labelDt.Rows[i]["DESC7"] = ITAB.GetString("DESC7");
+                    labelDt.Rows[i]["DESC8"] = ITAB.GetString("DESC8");
+                    labelDt.Rows[i]["DESC9"] = ITAB.GetString("DESC9");
+                    labelDt.Rows[i]["DESC10"] = ITAB.GetString("DESC10");
+                    labelDt.Rows[i]["BOXCODE"] = ITAB.GetString("BOXCODE");
+                    labelDt.Rows[i]["LBLCODE"] = ITAB.GetString("LBLCODE");
+                    labelDt.Rows[i]["LBLTYPE"] = ITAB.GetString("LBLTYPE");
+                    labelDt.Rows[i]["LBLSTYE"] = ITAB.GetString("LBLSTYE");
 
                     if ((ITAB.GetString("QRCODE") == null) || (ITAB.GetString("QRCODE") == "") || (ITAB.GetString("QRCODE") == " "))
                     {
-                        dt.Rows[i]["QRCODE"] = "";
-                        dt.Rows[i]["HBSQRCODE"] = "";
+                        labelDt.Rows[i]["QRCODE"] = "";
+                        labelDt.Rows[i]["HBSQRCODE"] = "";
                     }
                     else
                     {
-                        dt.Rows[i]["QRCODE"] = ITAB.GetString("QRCODE");
-                        dt.Rows[i]["HBSQRCODE"] = dt.Rows[i]["QRCODE"].ToString() + dt.Rows[i]["CUS_ITEM"].ToString();
+                        labelDt.Rows[i]["QRCODE"] = ITAB.GetString("QRCODE");
+                        labelDt.Rows[i]["HBSQRCODE"] = labelDt.Rows[i]["QRCODE"].ToString() + labelDt.Rows[i]["CUS_ITEM"].ToString();
                     }
-
                 }
-
-
             }
             BindingSource bs = new BindingSource();
-            dtCount = dt.Rows.Count + 1;
-            bs.DataSource = dt.DefaultView;
+            var dtCount = labelDt.Rows.Count + 1;
+            bs.DataSource = labelDt.DefaultView;
             dataGridView1.DefaultCellStyle.Padding = new Padding(0, 0, 0, 0);
             dataGridView1.DataSource = bs;
 
             foreach (DataGridViewColumn column in dataGridView1.Columns)
             {
                 //表頭選擇
-                column.HeaderCell = new
-                DataGridViewAutoFilterColumnHeaderCell(column.HeaderCell);
+                column.HeaderCell = new DataGridViewAutoFilterColumnHeaderCell(column.HeaderCell);
 
                 //禁止排序
                 column.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
 
-
-            //欄位數值格式, 設定到資料最後一筆，避免大容量的excel檔
-            app.Application.get_Range("A1", "BZ" + dtCount.ToString()).NumberFormat = "@";
-
             Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
             Microsoft.Office.Interop.Excel._Worksheet calcSheet = null;
-
-            app.Visible = true;  // excel 程式是否顯示
 
             worksheet = workbook.Sheets["工作表2"];
             worksheet.Name = "標籤明細";
@@ -681,7 +658,23 @@ namespace PACKINGLIST
             calcSheet.Range["B2"].Copy(calcSheet.Range["B3:B" + calcsheetMaxRows]);
 
             //刪掉多的工作表
-            workbook.Sheets["工作表2"].Delete();
+            //workbook.Sheets["工作表2"].Delete();
+
+        }
+
+        private string GetStandardExcelColumnName(int columnNumberOneBased)
+        {
+            int baseValue = Convert.ToInt32('A');
+            int columnNumberZeroBased = columnNumberOneBased - 1;
+
+            string ret = "";
+
+            if (columnNumberOneBased > 26)
+            {
+                ret = GetStandardExcelColumnName(columnNumberZeroBased / 26);
+            }
+
+            return ret + Convert.ToChar(baseValue + (columnNumberZeroBased % 26));
 
         }
 

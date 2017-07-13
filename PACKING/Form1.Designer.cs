@@ -114,9 +114,9 @@
             // 
             this.btnConvert.Location = new System.Drawing.Point(106, 135);
             this.btnConvert.Name = "btnConvert";
-            this.btnConvert.Size = new System.Drawing.Size(65, 23);
+            this.btnConvert.Size = new System.Drawing.Size(88, 23);
             this.btnConvert.TabIndex = 69;
-            this.btnConvert.Text = "匯出清單";
+            this.btnConvert.Text = "產生包裝明細";
             this.btnConvert.UseVisualStyleBackColor = true;
             this.btnConvert.Click += new System.EventHandler(this.btnConvert_Click);
             // 
@@ -212,11 +212,11 @@
             // 
             // btnTodb
             // 
-            this.btnTodb.Location = new System.Drawing.Point(177, 135);
+            this.btnTodb.Location = new System.Drawing.Point(200, 135);
             this.btnTodb.Name = "btnTodb";
-            this.btnTodb.Size = new System.Drawing.Size(62, 23);
+            this.btnTodb.Size = new System.Drawing.Size(93, 23);
             this.btnTodb.TabIndex = 72;
-            this.btnTodb.Text = "開立包裝";
+            this.btnTodb.Text = "產生標籤明細";
             this.btnTodb.UseVisualStyleBackColor = true;
             this.btnTodb.Click += new System.EventHandler(this.btnTodb_Click);
             // 
