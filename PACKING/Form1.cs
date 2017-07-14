@@ -425,7 +425,24 @@ namespace PACKINGLIST
             app.Visible = true;  // excel 程式是否顯示
 
             generatePackingSheet(workbook);
-            //generateLabelSheet(workbook);
+
+            //檢查GRIDVIEW
+            if (dgvPacking.Rows.Count == 0)
+            {
+                MessageBox.Show("沒有資料", "錯誤");
+                btnClear.PerformClick();
+            }
+            else
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                //寫入 PACKING table
+                bulkWriteToPacking(dt);
+                //寫入 CUSTOMS table
+                bulkWriteToCustoms(dt);
+                Cursor.Current = Cursors.Default;
+            }
+
+            generateLabelSheet(workbook);
 
             if (File.Exists(fullPathToExcel))
             {
@@ -452,8 +469,6 @@ namespace PACKINGLIST
 
         private void generatePackingSheet(_Workbook workbook)
         {
-            Microsoft.Office.Interop.Excel._Worksheet labelSheet = null;
-            Microsoft.Office.Interop.Excel._Worksheet calcSheet = null;
             Microsoft.Office.Interop.Excel._Worksheet packingSheet = null;
 
             packingSheet = workbook.Sheets["工作表1"];
@@ -535,9 +550,15 @@ namespace PACKINGLIST
             packingSheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬
             ((Microsoft.Office.Interop.Excel.Range)packingSheet.Columns["A:B", System.Type.Missing]).ColumnWidth = 8;
 
-            btnTodb.PerformClick();
 
-            //處理 label 資料
+        }
+
+        private void generateLabelSheet(_Workbook workbook)
+        {
+            Microsoft.Office.Interop.Excel._Worksheet labelSheet = null;
+            Microsoft.Office.Interop.Excel._Worksheet calcSheet = null;
+
+
             System.Data.DataTable labelDt = getLabelDataFromView();
 
             if (labelDt.Rows.Count > 0)
@@ -738,10 +759,6 @@ namespace PACKINGLIST
                 MessageBox.Show("標籤明細沒有資料", "錯誤");
             }
 
-        }
-
-        private void generateLabelSheet(_Workbook workbook)
-        {
 
         }
 
@@ -791,24 +808,6 @@ namespace PACKINGLIST
 
         private void btnTodb_Click(object sender, EventArgs e)
         {
-            //檢查GRIDVIEW
-            if (dgvPacking.Rows.Count == 0)
-            {
-                MessageBox.Show("沒有資料", "錯誤");
-                btnClear.PerformClick();
-            }
-            else
-            {
-                Cursor.Current = Cursors.WaitCursor;
-                //寫入 PACKING table
-                bulkWriteToPacking(dt);
-                //寫入 CUSTOMS table
-                bulkWriteToCustoms(dt);
-                Cursor.Current = Cursors.Default;
-
-                //tsLabel.Text = "資料已寫入資料庫，鍵值為：" + packingKey + "，已自動複製到剪貼簿！";
-                //Clipboard.SetText(packingKey);
-            }
         }
         private void bulkWriteToPacking(System.Data.DataTable dataTable)
         {
