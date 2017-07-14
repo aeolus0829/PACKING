@@ -349,8 +349,8 @@ namespace PACKINGLIST
                     }
                 }
 
-                dataGridView1.DataSource = dt.DefaultView;
-                dataGridView1.ReadOnly = true;
+                dgvPacking.DataSource = dt.DefaultView;
+                dgvPacking.ReadOnly = true;
                 Cursor.Current = Cursors.Default;
             }
             //datatable加總
@@ -422,10 +422,10 @@ namespace PACKINGLIST
             //設定工作表數量
             app.SheetsInNewWorkbook = 4;
 
-            app.Visible = false;  // excel 程式是否顯示
+            app.Visible = true;  // excel 程式是否顯示
 
             generatePackingSheet(workbook);
-            generateLabelSheet(workbook);
+            //generateLabelSheet(workbook);
 
             if (File.Exists(fullPathToExcel))
             {
@@ -442,244 +442,20 @@ namespace PACKINGLIST
 
             workbook.SaveAs(fullPathToExcel, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, 
                 Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+
             app.Quit();
+
             Cursor.Current = Cursors.Default;
 
             tsLabel.Text = "轉檔已完成！放在 " + fullPathToExcel;
         }
 
-        private void generateLabelSheet(_Workbook workbook)
-        {
-            string strSQL = "Select * from LABEL where [KEY] = @key order by _NullFlags"; 
-            SqlConnection conn = new SqlConnection(dbConnStr);
-            SqlCommand cmd = new SqlCommand(strSQL, conn);
-            cmd.CommandType = CommandType.Text;
-            conn.Open();
-
-            SqlParameter paraKey = new SqlParameter("@key", SqlDbType.Char, 14);
-            paraKey.Value = packingKey;
-            paraKey.Direction = ParameterDirection.Input;
-            cmd.Parameters.Add(paraKey);
-
-            SqlDataReader sqlReader = cmd.ExecuteReader();
-
-            System.Data.DataTable labelDt = new System.Data.DataTable();
-            labelDt.Load(sqlReader, LoadOption.OverwriteChanges);
-            cmd.Dispose();
-            conn.Close();
-            conn.Dispose();
-
-            labelDt.Columns.Add("OTH_REF");
-            labelDt.Columns.Add("OLD_ITEM");
-            labelDt.Columns.Add("BOXCODE");
-            labelDt.Columns.Add("MOGNBR1");
-            labelDt.Columns.Add("ENGDES");
-            labelDt.Columns.Add("SPNDES");
-            labelDt.Columns.Add("GERDES");
-            labelDt.Columns.Add("LBLCODE");
-            labelDt.Columns.Add("LBLTYPE");
-            labelDt.Columns.Add("LBLSTYE");
-            labelDt.Columns.Add("OENBR1");
-            labelDt.Columns.Add("OENBR2");
-            labelDt.Columns.Add("OENBR3");
-            labelDt.Columns.Add("OENBR4");
-            labelDt.Columns.Add("OENBR5");
-            labelDt.Columns.Add("OENBR6");
-            labelDt.Columns.Add("OENBR7");
-            labelDt.Columns.Add("OENBR8");
-            labelDt.Columns.Add("OENBR9");
-            labelDt.Columns.Add("OENBR10");
-            labelDt.Columns.Add("MOGNBR2");
-            labelDt.Columns.Add("TPFNBR1");
-            labelDt.Columns.Add("TPFNBR2");
-            labelDt.Columns.Add("TRWNBR1");
-            labelDt.Columns.Add("TRWNBR2");
-            labelDt.Columns.Add("DANNBR1");
-            labelDt.Columns.Add("DANNBR2");
-            labelDt.Columns.Add("MCQNBR1");
-            labelDt.Columns.Add("MCQNBR2");
-            labelDt.Columns.Add("DESC1");
-            labelDt.Columns.Add("DESC2");
-            labelDt.Columns.Add("DESC3");
-            labelDt.Columns.Add("DESC4");
-            labelDt.Columns.Add("DESC5");
-            labelDt.Columns.Add("DESC6");
-            labelDt.Columns.Add("DESC7");
-            labelDt.Columns.Add("DESC8");
-            labelDt.Columns.Add("DESC9");
-            labelDt.Columns.Add("DESC10");
-            labelDt.Columns.Add("QRCODE");
-            labelDt.Columns.Add("HBSQRCODE");
-
-            var rfcGetPackingFM = rfcRepo.CreateFunction(getLabelData); 
-
-            for (int i = 0; i <= labelDt.Rows.Count - 1; i++)
-            {
-                rfcGetPackingFM.SetValue("P_VBELN", labelDt.Rows[i]["NBR"]);   //訂單號碼
-                rfcGetPackingFM.SetValue("P_POSNR", labelDt.Rows[i]["POSNR"].ToString());  //訂單項次
-
-                rfcGetPackingFM.Invoke(rfcDest);
-
-                IRfcTable ITAB = rfcGetPackingFM.GetTable("ITAB");
-                if (ITAB.CurrentIndex == 0)
-                {
-                    //只取第一列
-                    ITAB.CurrentIndex = 0;
-                    labelDt.Rows[i]["OTH_REF"] = ITAB.GetString("KDMAT");
-                    labelDt.Rows[i]["OLD_ITEM"] = ITAB.GetString("BISMT");
-                    labelDt.Rows[i]["OENBR1"] = ITAB.GetString("OENBR1");
-                    labelDt.Rows[i]["OENBR2"] = ITAB.GetString("OENBR2");
-                    labelDt.Rows[i]["OENBR3"] = ITAB.GetString("OENBR3");
-                    labelDt.Rows[i]["OENBR4"] = ITAB.GetString("OENBR4");
-                    labelDt.Rows[i]["OENBR5"] = ITAB.GetString("OENBR5");
-                    labelDt.Rows[i]["OENBR6"] = ITAB.GetString("OENBR6");
-                    labelDt.Rows[i]["OENBR7"] = ITAB.GetString("OENBR7");
-                    labelDt.Rows[i]["OENBR8"] = ITAB.GetString("OENBR8");
-                    labelDt.Rows[i]["OENBR9"] = ITAB.GetString("OENBR9");
-                    labelDt.Rows[i]["OENBR10"] = ITAB.GetString("OENBR10");
-                    labelDt.Rows[i]["MOGNBR1"] = ITAB.GetString("MOGNBR1");
-                    labelDt.Rows[i]["MOGNBR2"] = ITAB.GetString("MOGNBR2");
-                    labelDt.Rows[i]["TPFNBR1"] = ITAB.GetString("TPFNBR1");
-                    labelDt.Rows[i]["TPFNBR2"] = ITAB.GetString("TPFNBR2");
-                    labelDt.Rows[i]["TRWNBR1"] = ITAB.GetString("TRWNBR1");
-                    labelDt.Rows[i]["TRWNBR2"] = ITAB.GetString("TRWNBR2");
-                    labelDt.Rows[i]["DANNBR1"] = ITAB.GetString("DANNBR1");
-                    labelDt.Rows[i]["DANNBR2"] = ITAB.GetString("DANNBR2");
-                    labelDt.Rows[i]["MCQNBR1"] = ITAB.GetString("MCQNBR1");
-                    labelDt.Rows[i]["MCQNBR2"] = ITAB.GetString("MCQNBR2");
-                    labelDt.Rows[i]["ENGDES"] = ITAB.GetString("ENGDES");
-                    labelDt.Rows[i]["SPNDES"] = ITAB.GetString("SPNDES");
-                    labelDt.Rows[i]["GERDES"] = ITAB.GetString("GERDES");
-                    labelDt.Rows[i]["DESC1"] = ITAB.GetString("DESC1");
-                    labelDt.Rows[i]["DESC2"] = ITAB.GetString("DESC2");
-                    labelDt.Rows[i]["DESC3"] = ITAB.GetString("DESC3");
-                    labelDt.Rows[i]["DESC4"] = ITAB.GetString("DESC4");
-                    labelDt.Rows[i]["DESC5"] = ITAB.GetString("DESC5");
-                    labelDt.Rows[i]["DESC6"] = ITAB.GetString("DESC6");
-                    labelDt.Rows[i]["DESC7"] = ITAB.GetString("DESC7");
-                    labelDt.Rows[i]["DESC8"] = ITAB.GetString("DESC8");
-                    labelDt.Rows[i]["DESC9"] = ITAB.GetString("DESC9");
-                    labelDt.Rows[i]["DESC10"] = ITAB.GetString("DESC10");
-                    labelDt.Rows[i]["BOXCODE"] = ITAB.GetString("BOXCODE");
-                    labelDt.Rows[i]["LBLCODE"] = ITAB.GetString("LBLCODE");
-                    labelDt.Rows[i]["LBLTYPE"] = ITAB.GetString("LBLTYPE");
-                    labelDt.Rows[i]["LBLSTYE"] = ITAB.GetString("LBLSTYE");
-
-                    if ((ITAB.GetString("QRCODE") == null) || (ITAB.GetString("QRCODE") == "") || (ITAB.GetString("QRCODE") == " "))
-                    {
-                        labelDt.Rows[i]["QRCODE"] = "";
-                        labelDt.Rows[i]["HBSQRCODE"] = "";
-                    }
-                    else
-                    {
-                        labelDt.Rows[i]["QRCODE"] = ITAB.GetString("QRCODE");
-                        labelDt.Rows[i]["HBSQRCODE"] = labelDt.Rows[i]["QRCODE"].ToString() + labelDt.Rows[i]["CUS_ITEM"].ToString();
-                    }
-                }
-            }
-            BindingSource bs = new BindingSource();
-            var dtCount = labelDt.Rows.Count + 1;
-            bs.DataSource = labelDt.DefaultView;
-            dataGridView1.DefaultCellStyle.Padding = new Padding(0, 0, 0, 0);
-            dataGridView1.DataSource = bs;
-
-            foreach (DataGridViewColumn column in dataGridView1.Columns)
-            {
-                //表頭選擇
-                column.HeaderCell = new DataGridViewAutoFilterColumnHeaderCell(column.HeaderCell);
-
-                //禁止排序
-                column.SortMode = DataGridViewColumnSortMode.NotSortable;
-            }
-
-            Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
-            Microsoft.Office.Interop.Excel._Worksheet calcSheet = null;
-
-            worksheet = workbook.Sheets["工作表2"];
-            worksheet.Name = "標籤明細";
-
-            //計算 dataGrid 的欄列數
-            string maxCols = GetStandardExcelColumnName(dataGridView1.Columns.Count);
-            string maxRows = dataGridView1.Rows.Count.ToString();
-
-            //將 datagrid 填入 excel 中
-            //填上標題列
-            for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
-            {
-                worksheet.Cells[1, i] = dataGridView1.Columns[i - 1].HeaderText;
-            }
-
-            //宣告 datagrid 沒有標題列
-            dataGridView1.RowHeadersVisible = false;
-
-            //將資料從 datagrid 貼到 object 
-            dataGridView1.SelectAll();
-            DataObject dataObj = dataGridView1.GetClipboardContent();
-            if (dataObj != null) Clipboard.SetDataObject(dataObj);
-
-            //將 object 傳給 workbook
-            worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets.get_Item(1);
-
-            //將資料貼入第二列 (第一列是標題列)
-            Microsoft.Office.Interop.Excel.Range workRange = (Microsoft.Office.Interop.Excel.Range)worksheet.Cells[2, 1];
-
-            workRange.Select();
-
-            //從剪貼薄貼上
-            worksheet.PasteSpecial(workRange, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
-
-            //將 worksheet 複製一份到 calcsheet
-            worksheet.Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
-
-            // 複製的 excel 更名
-            workbook.Sheets[workbook.Sheets.Count].Name = "計算張數";
-
-            //選取 calcSheet
-            calcSheet = workbook.Sheets[workbook.Sheets.Count];
-
-            //刪掉不要的部份
-            calcSheet.Range["A1:I" + maxRows].Delete();
-            calcSheet.Range["B1:" + maxCols + maxRows].Delete();
-
-            //去除重覆料號
-            calcSheet.Range["A1:A" + maxRows].RemoveDuplicates(1);
-            calcSheet.UsedRange.NumberFormat = "General";
-            calcSheet.Range["A1"].Value = "料號";
-            calcSheet.Range["B1"].Value = "張數";
-
-            //求有值的最大列數
-            int calcsheetMaxRows = calcSheet.Range["A1"].Offset[calcSheet.Rows.Count - 1, 0].End[Microsoft.Office.Interop.Excel.XlDirection.xlUp].Row;
-
-            calcSheet.Range["B2"].Value = "=COUNTIF(標籤明細!J:J,A2)";
-
-            //將公式往下複製
-            calcSheet.Range["B2"].Copy(calcSheet.Range["B3:B" + calcsheetMaxRows]);
-
-            //刪掉多的工作表
-            //workbook.Sheets["工作表2"].Delete();
-
-        }
-
-        private string GetStandardExcelColumnName(int columnNumberOneBased)
-        {
-            int baseValue = Convert.ToInt32('A');
-            int columnNumberZeroBased = columnNumberOneBased - 1;
-
-            string ret = "";
-
-            if (columnNumberOneBased > 26)
-            {
-                ret = GetStandardExcelColumnName(columnNumberZeroBased / 26);
-            }
-
-            return ret + Convert.ToChar(baseValue + (columnNumberZeroBased % 26));
-
-        }
-
         private void generatePackingSheet(_Workbook workbook)
         {
-            
+            Microsoft.Office.Interop.Excel._Worksheet labelSheet = null;
+            Microsoft.Office.Interop.Excel._Worksheet calcSheet = null;
             Microsoft.Office.Interop.Excel._Worksheet packingSheet = null;
+
             packingSheet = workbook.Sheets["工作表1"];
             packingSheet = workbook.ActiveSheet;
             packingSheet.Name = "訂單包裝明細";
@@ -704,30 +480,30 @@ namespace PACKINGLIST
             packingSheet.Cells[estDeliveryDateRow, firstColumnNum] = lblEstDeliveryDate.Text;
 
             // 計算項目資料筆數，lastVisbleColumnCount 是允許出貨組看到的最大欄位數
-            itemCount = itemCount + lastVisbleColumnCount + dataGridView1.Rows.Count;
+            itemCount = itemCount + lastVisbleColumnCount + dgvPacking.Rows.Count;
 
             //  excel 資料全部轉為文字 
             packingSheet.Columns.EntireColumn.NumberFormat = "@";
 
             int itemDetailRowStart = itemHeaderRowStart + 1;
-            int textRowStart = itemDetailRowStart + dataGridView1.Rows.Count + 1;
+            int textRowStart = itemDetailRowStart + dgvPacking.Rows.Count + 1;
 
 
             //表頭
             for (int i = 0; i <= lastVisbleColumnCount; i++)
             {
                 columnNum = i + 1;
-                packingSheet.Cells[itemHeaderRowStart, columnNum] = dataGridView1.Columns[i].HeaderText;
+                packingSheet.Cells[itemHeaderRowStart, columnNum] = dgvPacking.Columns[i].HeaderText;
             }
 
             //項目
             //宣告 datagrid 沒有標題列
-            dataGridView1.RowHeadersVisible = false;
+            dgvPacking.RowHeadersVisible = false;
 
             //將資料從 datagrid 貼到 object 
-            dataGridView1.SelectAll();
+            dgvPacking.SelectAll();
 
-            DataObject dobj = dataGridView1.GetClipboardContent();
+            DataObject dobj = dgvPacking.GetClipboardContent();
             if (dobj != null) Clipboard.SetDataObject(dobj);
 
             //將 object 傳給 workbook
@@ -741,9 +517,9 @@ namespace PACKINGLIST
             packingSheet.PasteSpecial(itemRangeStart, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
 
             //清除不需要資料的欄位
-            packingSheet.Range["S" + itemBodyRowStart + ":AL" + dataGridView1.Rows.Count + itemBodyRowStart].Clear();
+            packingSheet.Range["S" + itemBodyRowStart + ":AL" + dgvPacking.Rows.Count + itemBodyRowStart].Clear();
 
-            int borderRange = dataGridView1.Rows.Count + itemHeaderRowStart;
+            int borderRange = dgvPacking.Rows.Count + itemHeaderRowStart;
 
             for (int i = itemHeaderRowStart; i < borderRange; i++)
             {
@@ -759,12 +535,264 @@ namespace PACKINGLIST
             packingSheet.Cells.EntireColumn.AutoFit(); //自動調整欄寬
             ((Microsoft.Office.Interop.Excel.Range)packingSheet.Columns["A:B", System.Type.Missing]).ColumnWidth = 8;
 
+            btnTodb.PerformClick();
+
+            //處理 label 資料
+            System.Data.DataTable labelDt = getLabelDataFromView();
+
+            if (labelDt.Rows.Count > 0)
+            {
+                labelDt.Columns.Add("OTH_REF");
+                labelDt.Columns.Add("OLD_ITEM");
+                labelDt.Columns.Add("BOXCODE");
+                labelDt.Columns.Add("MOGNBR1");
+                labelDt.Columns.Add("ENGDES");
+                labelDt.Columns.Add("SPNDES");
+                labelDt.Columns.Add("GERDES");
+                labelDt.Columns.Add("LBLCODE");
+                labelDt.Columns.Add("LBLTYPE");
+                labelDt.Columns.Add("LBLSTYE");
+                labelDt.Columns.Add("OENBR1");
+                labelDt.Columns.Add("OENBR2");
+                labelDt.Columns.Add("OENBR3");
+                labelDt.Columns.Add("OENBR4");
+                labelDt.Columns.Add("OENBR5");
+                labelDt.Columns.Add("OENBR6");
+                labelDt.Columns.Add("OENBR7");
+                labelDt.Columns.Add("OENBR8");
+                labelDt.Columns.Add("OENBR9");
+                labelDt.Columns.Add("OENBR10");
+                labelDt.Columns.Add("MOGNBR2");
+                labelDt.Columns.Add("TPFNBR1");
+                labelDt.Columns.Add("TPFNBR2");
+                labelDt.Columns.Add("TRWNBR1");
+                labelDt.Columns.Add("TRWNBR2");
+                labelDt.Columns.Add("DANNBR1");
+                labelDt.Columns.Add("DANNBR2");
+                labelDt.Columns.Add("MCQNBR1");
+                labelDt.Columns.Add("MCQNBR2");
+                labelDt.Columns.Add("DESC1");
+                labelDt.Columns.Add("DESC2");
+                labelDt.Columns.Add("DESC3");
+                labelDt.Columns.Add("DESC4");
+                labelDt.Columns.Add("DESC5");
+                labelDt.Columns.Add("DESC6");
+                labelDt.Columns.Add("DESC7");
+                labelDt.Columns.Add("DESC8");
+                labelDt.Columns.Add("DESC9");
+                labelDt.Columns.Add("DESC10");
+                labelDt.Columns.Add("QRCODE");
+                labelDt.Columns.Add("HBSQRCODE");
+
+                var rfcGetPackingFM = rfcRepo.CreateFunction(getLabelData);
+
+                for (int i = 0; i <= labelDt.Rows.Count - 1; i++)
+                {
+
+                    var nbr = labelDt.Rows[i]["NBR"];
+                    var posnr = labelDt.Rows[i]["POSNR"].ToString();
+
+                    rfcGetPackingFM.SetValue("P_VBELN", nbr);   //訂單號碼
+                    rfcGetPackingFM.SetValue("P_POSNR", posnr);  //訂單項次
+
+                    rfcGetPackingFM.Invoke(rfcDest);
+
+                    IRfcTable ITAB = rfcGetPackingFM.GetTable("ITAB");
+                    if (ITAB.CurrentIndex == 0)
+                    {
+                        //只取第一列
+                        ITAB.CurrentIndex = 0;
+                        labelDt.Rows[i]["OTH_REF"] = ITAB.GetString("KDMAT");
+                        labelDt.Rows[i]["OLD_ITEM"] = ITAB.GetString("BISMT");
+                        labelDt.Rows[i]["OENBR1"] = ITAB.GetString("OENBR1");
+                        labelDt.Rows[i]["OENBR2"] = ITAB.GetString("OENBR2");
+                        labelDt.Rows[i]["OENBR3"] = ITAB.GetString("OENBR3");
+                        labelDt.Rows[i]["OENBR4"] = ITAB.GetString("OENBR4");
+                        labelDt.Rows[i]["OENBR5"] = ITAB.GetString("OENBR5");
+                        labelDt.Rows[i]["OENBR6"] = ITAB.GetString("OENBR6");
+                        labelDt.Rows[i]["OENBR7"] = ITAB.GetString("OENBR7");
+                        labelDt.Rows[i]["OENBR8"] = ITAB.GetString("OENBR8");
+                        labelDt.Rows[i]["OENBR9"] = ITAB.GetString("OENBR9");
+                        labelDt.Rows[i]["OENBR10"] = ITAB.GetString("OENBR10");
+                        labelDt.Rows[i]["MOGNBR1"] = ITAB.GetString("MOGNBR1");
+                        labelDt.Rows[i]["MOGNBR2"] = ITAB.GetString("MOGNBR2");
+                        labelDt.Rows[i]["TPFNBR1"] = ITAB.GetString("TPFNBR1");
+                        labelDt.Rows[i]["TPFNBR2"] = ITAB.GetString("TPFNBR2");
+                        labelDt.Rows[i]["TRWNBR1"] = ITAB.GetString("TRWNBR1");
+                        labelDt.Rows[i]["TRWNBR2"] = ITAB.GetString("TRWNBR2");
+                        labelDt.Rows[i]["DANNBR1"] = ITAB.GetString("DANNBR1");
+                        labelDt.Rows[i]["DANNBR2"] = ITAB.GetString("DANNBR2");
+                        labelDt.Rows[i]["MCQNBR1"] = ITAB.GetString("MCQNBR1");
+                        labelDt.Rows[i]["MCQNBR2"] = ITAB.GetString("MCQNBR2");
+                        labelDt.Rows[i]["ENGDES"] = ITAB.GetString("ENGDES");
+                        labelDt.Rows[i]["SPNDES"] = ITAB.GetString("SPNDES");
+                        labelDt.Rows[i]["GERDES"] = ITAB.GetString("GERDES");
+                        labelDt.Rows[i]["DESC1"] = ITAB.GetString("DESC1");
+                        labelDt.Rows[i]["DESC2"] = ITAB.GetString("DESC2");
+                        labelDt.Rows[i]["DESC3"] = ITAB.GetString("DESC3");
+                        labelDt.Rows[i]["DESC4"] = ITAB.GetString("DESC4");
+                        labelDt.Rows[i]["DESC5"] = ITAB.GetString("DESC5");
+                        labelDt.Rows[i]["DESC6"] = ITAB.GetString("DESC6");
+                        labelDt.Rows[i]["DESC7"] = ITAB.GetString("DESC7");
+                        labelDt.Rows[i]["DESC8"] = ITAB.GetString("DESC8");
+                        labelDt.Rows[i]["DESC9"] = ITAB.GetString("DESC9");
+                        labelDt.Rows[i]["DESC10"] = ITAB.GetString("DESC10");
+                        labelDt.Rows[i]["BOXCODE"] = ITAB.GetString("BOXCODE");
+                        labelDt.Rows[i]["LBLCODE"] = ITAB.GetString("LBLCODE");
+                        labelDt.Rows[i]["LBLTYPE"] = ITAB.GetString("LBLTYPE");
+                        labelDt.Rows[i]["LBLSTYE"] = ITAB.GetString("LBLSTYE");
+
+                        if ((ITAB.GetString("QRCODE") == null) || (ITAB.GetString("QRCODE") == "") || (ITAB.GetString("QRCODE") == " "))
+                        {
+                            labelDt.Rows[i]["QRCODE"] = "";
+                            labelDt.Rows[i]["HBSQRCODE"] = "";
+                        }
+                        else
+                        {
+                            labelDt.Rows[i]["QRCODE"] = ITAB.GetString("QRCODE");
+                            labelDt.Rows[i]["HBSQRCODE"] = labelDt.Rows[i]["QRCODE"].ToString() + labelDt.Rows[i]["CUS_ITEM"].ToString();
+                        }
+                    }
+                }
+
+                BindingSource bs = new BindingSource();
+                bs.DataSource = labelDt.DefaultView;
+                dgvPacking.DataSource = null;
+
+                dgvPacking.DataSource = bs;
+
+                foreach (DataGridViewColumn column in dgvPacking.Columns)
+                {
+                    //表頭選擇
+                    column.HeaderCell = new DataGridViewAutoFilterColumnHeaderCell(column.HeaderCell);
+
+                    //禁止排序
+                    column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                }
+
+                labelSheet = workbook.Sheets["工作表2"];
+                labelSheet.Name = "標籤明細";
+                labelSheet.Select();
+
+                //計算 dataGrid 的欄列數
+                string maxCols = GetStandardExcelColumnName(dgvPacking.Columns.Count);
+                string maxRows = dgvPacking.Rows.Count.ToString();
+
+                //將 datagrid 填入 excel 中
+                //填上標題列
+                for (int i = 1; i < dgvPacking.Columns.Count + 1; i++)
+                {
+                    labelSheet.Cells[1, i] = dgvPacking.Columns[i - 1].HeaderText;
+                }
+
+                //宣告 datagrid 沒有標題列
+                dgvPacking.RowHeadersVisible = false;
+
+                //將資料從 datagrid 貼到 object    
+                dgvPacking.SelectAll();
+                DataObject dataObj = dgvPacking.GetClipboardContent();
+                if (dataObj != null) Clipboard.SetDataObject(dataObj);
+
+                //將 object 傳給 workbook
+                labelSheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Worksheets.get_Item(1);
+
+                //將資料貼入第二列 (第一列是標題列)
+                labelSheet = workbook.ActiveSheet;
+                labelSheet.Application.Goto(labelSheet.Range["A2"], true);
+
+                //從剪貼薄貼上
+                labelSheet.PasteSpecial(Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
+
+                //將 worksheet 複製一份到 calcsheet
+                labelSheet.Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
+
+                // 複製的 sheet 更名 
+                workbook.Sheets[workbook.Sheets.Count].Name = "計算張數";
+
+                //選取 calcSheet
+                calcSheet = workbook.Sheets[workbook.Sheets.Count];
+
+                //刪掉不要的部份
+                calcSheet.Range["A1:I" + maxRows].Delete();
+                calcSheet.Range["B1:" + maxCols + maxRows].Delete();
+
+                //去除重覆料號
+                calcSheet.Range["A1:A" + maxRows].RemoveDuplicates(1);
+                calcSheet.UsedRange.NumberFormat = "General";
+                calcSheet.Range["A1"].Value = "料號";
+                calcSheet.Range["B1"].Value = "張數";
+
+                //求有值的最大列數
+                int calcsheetMaxRows = calcSheet.Range["A1"].Offset[calcSheet.Rows.Count - 1, 0].End[Microsoft.Office.Interop.Excel.XlDirection.xlUp].Row;
+
+                calcSheet.Range["B2"].Value = "=COUNTIF(標籤明細!J:J,A2)";
+
+                //將公式往下複製
+                calcSheet.Range["B2"].Copy(calcSheet.Range["B3:B" + calcsheetMaxRows]);
+
+                //刪掉多的工作表
+                //workbook.Sheets["工作表2"].Delete();
+            }
+            else
+            {
+                MessageBox.Show("標籤明細沒有資料", "錯誤");
+            }
+
+        }
+
+        private void generateLabelSheet(_Workbook workbook)
+        {
+
+        }
+
+        private System.Data.DataTable getLabelDataFromView()
+        {
+            var strSQL = "Select * from LABEL where [KEY] = @sqlPara order by _NullFlags";
+            System.Data.DataTable result = new System.Data.DataTable();
+            var paraKey = new SqlParameter("@sqlPara", SqlDbType.Char, 14);
+            paraKey.Value = packingKey;
+
+            var sqlConn = new SqlConnection(dbConnStr);
+
+            try
+            {
+                sqlConn.Open();
+                SqlCommand sCmd = new SqlCommand(strSQL, sqlConn);
+                sCmd.Parameters.Add(paraKey);
+                var value = sCmd.ExecuteReader();
+                result.Load(value);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "執行 execQuery() 出現問題");
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+            return result; ;
+        }
+
+        private string GetStandardExcelColumnName(int columnNumberOneBased)
+        {
+            int baseValue = Convert.ToInt32('A');
+            int columnNumberZeroBased = columnNumberOneBased - 1;
+
+            string ret = "";
+
+            if (columnNumberOneBased > 26)
+            {
+                ret = GetStandardExcelColumnName(columnNumberZeroBased / 26);
+            }
+
+            return ret + Convert.ToChar(baseValue + (columnNumberZeroBased % 26));
+
         }
 
         private void btnTodb_Click(object sender, EventArgs e)
         {
             //檢查GRIDVIEW
-            if (dataGridView1.Rows.Count == 0)
+            if (dgvPacking.Rows.Count == 0)
             {
                 MessageBox.Show("沒有資料", "錯誤");
                 btnClear.PerformClick();
@@ -778,10 +806,8 @@ namespace PACKINGLIST
                 bulkWriteToCustoms(dt);
                 Cursor.Current = Cursors.Default;
 
-                tsLabel.Text = "資料已寫入資料庫，鍵值為：" + packingKey + "，已自動複製到剪貼簿！";
-
-                Clipboard.SetText(packingKey);
-
+                //tsLabel.Text = "資料已寫入資料庫，鍵值為：" + packingKey + "，已自動複製到剪貼簿！";
+                //Clipboard.SetText(packingKey);
             }
         }
         private void bulkWriteToPacking(System.Data.DataTable dataTable)
