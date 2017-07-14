@@ -25,7 +25,7 @@ namespace PACKINGLIST
         //開發資訊
         bool isTesting = true;
         string formName = "PACKING";
-        string winFormVersion = "1.12";
+        string winFormVersion = "1.13";
 
         public Form1()
         {
@@ -60,6 +60,8 @@ namespace PACKINGLIST
         private void Form1_Load(object sender, EventArgs e)
         {
             dt.Clear();
+            lblCusName.Text = lblCusNum.Text = lblEstDeliveryDate.Text = lblOrderNum.Text = "";
+
             lbSalesText.Items.Clear();
             if (isTesting) this.Text += winFormVersion + " 測試版 " + "/ MSSQL: " + packingDB + " / SAP資料環境: " + sapDB;
             else this.Text += winFormVersion;
