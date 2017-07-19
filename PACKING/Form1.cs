@@ -23,13 +23,13 @@ namespace PACKINGLIST
         string getLabelData = "ZSDRFC009";
 
         //開發資訊
-        bool isTesting = true;
+        bool isTesting = false;
         string formName = "PACKING";
         string winFormVersion = "1.14";
 
         public Form1()
         {
-            setConnEev(isTesting);
+            setConnEnv(isTesting);
 
             var mssqlConn = new mssqlConnClass();
 
@@ -42,7 +42,7 @@ namespace PACKINGLIST
             else MessageBox.Show("目前程式停用中，可能是特定時間或缺乏使用權限，請連絡資訊組");
         }
 
-        private void setConnEev(bool isTesting)
+        private void setConnEnv(bool isTesting)
         {
             switch(isTesting)
             {
