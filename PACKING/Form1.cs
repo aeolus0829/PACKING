@@ -25,7 +25,7 @@ namespace PACKINGLIST
         //開發資訊
         bool isTesting = true;
         string formName = "PACKING";
-        string winFormVersion = "1.13";
+        string winFormVersion = "1.14";
 
         public Form1()
         {
@@ -424,7 +424,7 @@ namespace PACKINGLIST
             //設定工作表數量
             app.SheetsInNewWorkbook = 4;
 
-            app.Visible = true;  // excel 程式是否顯示
+            app.Visible = isTesting;  // excel 程式是否顯示
 
             generatePackingSheet(workbook);
 
@@ -721,11 +721,15 @@ namespace PACKINGLIST
 
                 //將資料貼入第二列 (第一列是標題列)
                 labelSheet = workbook.ActiveSheet;
+
+                //資料格式化
+                labelSheet.get_Range("A1", "BZ" + maxRows).NumberFormat = "@";
+
                 labelSheet.Application.Goto(labelSheet.Range["A2"], true);
 
                 //從剪貼薄貼上
                 labelSheet.PasteSpecial(Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, true);
-
+                
                 //將 worksheet 複製一份到 calcsheet
                 labelSheet.Copy(Type.Missing, workbook.Sheets[workbook.Sheets.Count]);
 
